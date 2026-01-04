@@ -1,0 +1,35 @@
+from fastapi import APIRouter, HTTPException, Depends
+
+from app.models.message import Message
+from app.models.user import User
+
+from typing import List, Annotated
+from app.dependencies.auth import get_current_active_user
+from app.dependencies.database import SessionDep
+
+from app.services import messages as message_service
+from app.services import chats as chats_service
+router = APIRouter()
+
+
+@router.get("/messages", tags=["messages"])
+async def get_messages(current_user: Annotated[User, Depends(get_current_active_user)], chat_id: int, session: SessionDep, offset: int = 0, limit: int = 100) -> List[Message]:
+    # If user has this current chat
+    chat = chats_service.get_chat_by_id(id=chat_id, session=session)
+
+    if not any(user.id == current_user.id for user in chat.users): 
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    messages = message_service.get_messages(chat_id=chat_id, limit=limit, offset=offset, session=session)
+    return messages
+
+
+@router.post("/messages", tags=["messages"])
+async def add_message(current_user: Annotated[User, Depends(get_current_active_user)], chat_id: int, content: str, session: SessionDep):
+    # If user has this current chat
+    chat = chats_service.get_chat_by_id(id=chat_id, session=session)
+    if not any(user.id == current_user.id for user in chat.users): 
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    message = message_service.add_message(chat_id=chat_id, content=content, session=session)
+    return message

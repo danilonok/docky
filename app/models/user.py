@@ -1,12 +1,16 @@
-from sqlmodel import Field, SQLModel 
+from sqlmodel import Field, SQLModel, Relationship
 from pydantic import EmailStr
 from pydantic import BaseModel
+from app.models.chat import ChatUserLink
 
 class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     email: EmailStr = Field(default=None, max_length=50)
     password_hash: str | None = Field(default=None)
     disabled: bool = False
+
+    chats: list["Chat"] = Relationship(back_populates='users', link_model=ChatUserLink)
+
 
 class UserRegistrationDTO(BaseModel):
     email: EmailStr = Field(default=None, max_length=50)

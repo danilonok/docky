@@ -7,7 +7,7 @@ from datetime import timedelta
 
 from app.dependencies.database import SessionDep
 
-from .routers import users
+from .routers import users, chats, messages
 from typing import Annotated
 
 from app.auth.helpers import ACCESS_TOKEN_EXPIRE_MINUTES, Token
@@ -26,6 +26,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(users.router)
+app.include_router(chats.router)
+app.include_router(messages.router)
 
 @app.get("/")
 async def root():
