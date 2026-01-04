@@ -2,14 +2,18 @@
 Service module for user operations
 '''
 
-from app.models.user import User
+from app.models.user import User, UserRegistrationDTO
 from app.dependencies.database import SessionDep
 from typing import Annotated
 from fastapi import Query
 from sqlmodel import select
+from app.auth.helpers import get_password_hash
+
+from pydantic import EmailStr
 # CRUD Operations for Users
 
-def add_user(user: User, session: SessionDep):
+def add_user(user: UserRegistrationDTO, session: SessionDep):
+    user = User(email=user.email, password_hash=get_password_hash(password=user.password), disabled=False)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -19,7 +23,10 @@ def get_users(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(
     users = session.exec(select(User).offset(offset).limit(limit)).all()
     return users
 
-def get_user(id: int, session: SessionDep) -> User:
+def get_user_by_id(id: int, session: SessionDep) -> User:
     users = session.exec(select(User).where(User.id == id)).first()
     return users
 
+def get_user_by_email(email: EmailStr, session: SessionDep) -> User:
+    users = session.exec(select(User).where(User.email == email)).first()
+    return users
