@@ -21,15 +21,15 @@ def add_message(content: str, chat_id: int, session: SessionDep) -> Message:
     session.refresh(message)
     return message
 
-def get_messages(session: SessionDep, chat_id: int, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> list[Message]:
+def get_messages(session: SessionDep, chat_id: int, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> list[Message] | None:
     '''Get all chats of the current user'''
     chat = session.exec(select(Chat).where(Chat.id == chat_id)).first()
+    if chat:
+        messages = session.exec(select(Message).where(Message.chat_id == chat.id).offset(offset).limit(limit)).all()
+        return list(messages)
+    return None
 
-    messages = session.exec(select(Message).where(Message.chat_id == chat.id).offset(offset).limit(limit)).all()
-    print(messages)
-    return messages
-
-def get_message_by_id(id: int, session: SessionDep) -> Message:
+def get_message_by_id(id: int, session: SessionDep) -> Message | None:
     '''Get a particular message by the id'''
     message = session.exec(select(Message).where(Message.id == id)).first()
     return message
