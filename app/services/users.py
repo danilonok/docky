@@ -30,3 +30,13 @@ def get_user_by_id(id: int, session: SessionDep) -> User | None:
 def get_user_by_email(email: EmailStr, session: SessionDep) -> User | None:
     user = session.exec(select(User).where(User.email == email)).first()
     return user
+
+def delete_user_by_id(session: SessionDep, user_id: int) -> UserDTO | None:
+    '''Delete a user by an id'''
+    user = session.exec(select(User).where(User.id == user_id)).first()
+    if not user:
+        return None
+    
+    session.delete(user)
+    session.commit()
+    return UserDTO.model_validate(user)

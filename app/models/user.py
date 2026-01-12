@@ -9,7 +9,8 @@ class User(SQLModel, table=True):
     password_hash: str | None = Field(default=None)
     disabled: bool = False
 
-    chats: list["Chat"] = Relationship(back_populates='users', link_model=ChatUserLink) # type: ignore
+    chats: list["Chat"] = Relationship(back_populates='users', link_model=ChatUserLink, sa_relationship_kwargs={"cascade": "all"}) # type: ignore
+    messages: list["Message"] = Relationship(back_populates='user', cascade_delete=True) # type: ignore
 
 class UserDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)

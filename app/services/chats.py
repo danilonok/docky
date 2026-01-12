@@ -34,3 +34,13 @@ def get_chat_by_id(id: int, session: SessionDep) -> Chat | None:
     chat = session.exec(select(Chat).where(Chat.id == id)).first()
     return chat
 
+def delete_chat_by_id(session: SessionDep, chat_id: int) -> Chat | None:
+    '''Delete a chat by an id'''
+    chat = session.exec(select(Chat).where(Chat.id == chat_id)).first()
+    if not chat:
+        return None
+    
+    session.delete(chat)
+    session.commit()
+    return chat
+
