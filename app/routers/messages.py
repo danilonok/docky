@@ -13,10 +13,11 @@ router = APIRouter()
 
 
 @router.get("/messages", tags=["messages"])
-async def get_messages(current_user: Annotated[User, Depends(get_current_active_user)], chat_id: int, session: SessionDep, offset: int = 0, limit: int = 100) -> List[Message]:
+async def get_messages(current_user: Annotated[User, Depends(get_current_active_user)], chat_id: int, session: SessionDep, offset: int = 0, limit: int = 100) -> List[Message] | None:
     # If user has this current chat
     chat = chats_service.get_chat_by_id(id=chat_id, session=session)
-
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
     if not any(user.id == current_user.id for user in chat.users): 
         raise HTTPException(status_code=404, detail="Chat not found")
 
@@ -28,6 +29,7 @@ async def get_messages(current_user: Annotated[User, Depends(get_current_active_
 async def add_message(current_user: Annotated[User, Depends(get_current_active_user)], chat_id: int, content: str, session: SessionDep):
     # If user has this current chat
     chat = chats_service.get_chat_by_id(id=chat_id, session=session)
+    if not chat: raise HTTPException(status_code=404, detail="Chat not found")
     if not any(user.id == current_user.id for user in chat.users): 
         raise HTTPException(status_code=404, detail="Chat not found")
     

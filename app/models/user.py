@@ -13,6 +13,7 @@ class User(SQLModel, table=True):
 
 class UserDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    id: int
     email: EmailStr = Field(default=None, max_length=50)
     disabled: bool = False
 
