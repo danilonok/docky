@@ -1,0 +1,21 @@
+meta {
+  name: Add Message
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8000/messages?chat_id=3&content=How are you doing?
+  body: none
+  auth: inherit
+}
+
+params:query {
+  chat_id: 3
+  content: How are you doing?
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Get Messages
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8000/messages?chat_id=3&offset=0&limit=100
+  body: none
+  auth: inherit
+}
+
+params:query {
+  chat_id: 3
+  offset: 0
+  limit: 100
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

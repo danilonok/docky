@@ -1,0 +1,26 @@
+meta {
+  name: Add Chat
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/chats?title=New Test Chat
+  body: json
+  auth: inherit
+}
+
+params:query {
+  title: New Test Chat
+}
+
+body:json {
+  [
+    4
+  ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
