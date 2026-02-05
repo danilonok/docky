@@ -1,10 +1,14 @@
+meta {
+  name: FastAPI
+}
+
 auth {
   mode: oauth2
 }
 
 auth:oauth2 {
   grant_type: password
-  access_token_url: http://localhost:8000/token
+  access_token_url: {{baseUrl}}/token
   refresh_token_url: 
   username: user1@example.com
   password: string
@@ -17,4 +21,8 @@ auth:oauth2 {
   token_header_prefix: Bearer
   auto_fetch_token: true
   auto_refresh_token: false
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:8000
 }

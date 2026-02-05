@@ -6,11 +6,16 @@
 - [x] Simple data models for basic classes
 - [x] Get and Post methods for Users, Chats and Messages entities
 - [x] Delete method for each entity 
+- [x] Document upload
+- [x] Simple task system with celery
+- [x] Add simple RAG functionality
 
 ### Current tasks:
-- [ ] Adding Put methods to each entity
+
+- [ ] Add RAG-Chat functionality
 
 ### For later:
 - [ ] Fix chat deletion when one of the users gets deleted
 - [ ] Migration from SQLModel to SQLAlchemy + Pydantic
 - [ ] Adding Alembic for DB migrations
+- [ ] Adding Put methods to each entity

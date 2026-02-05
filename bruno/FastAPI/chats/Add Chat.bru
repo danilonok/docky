@@ -1,0 +1,109 @@
+meta {
+  name: Add Chat
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/chats
+  body: json
+  auth: inherit
+}
+
+params:query {
+  title: 
+}
+
+body:json {
+  [
+    {}
+  ]
+}
+
+example {
+  name: 200 Response
+  description: Successful Response
+  
+  request: {
+    url: {{baseUrl}}/chats
+    method: POST
+    mode: json
+    params:query: {
+      title: 
+    }
+  
+    body:json: {
+      [
+        0
+      ]
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "title": "",
+          "created_at": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 422 Response
+  description: Validation Error
+  
+  request: {
+    url: {{baseUrl}}/chats
+    method: POST
+    mode: json
+    params:query: {
+      title: 
+    }
+  
+    body:json: {
+      [
+        0
+      ]
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 422
+      text: Unprocessable Entity
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": [
+            {
+              "loc": [],
+              "msg": "",
+              "type": ""
+            }
+          ]
+        }
+      '''
+    }
+  }
+}

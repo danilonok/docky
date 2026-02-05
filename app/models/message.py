@@ -13,6 +13,9 @@ class Message(SQLModel, table=True):
     chat_id: int | None = Field(default=None, foreign_key="chat.id", ondelete="CASCADE")
     chat: Chat | None = Relationship(back_populates="messages")
     created_at: datetime = Field(default_factory= lambda: datetime.now())
+    reply_to: int | None
+    agentic: bool = False
+    finished: bool = True
     user_id: int | None = Field(default=None, foreign_key="user.id", ondelete="CASCADE")
     user: User | None = Relationship(back_populates="messages")
 

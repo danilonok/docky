@@ -29,7 +29,7 @@ def download_from_minio(filename, bucket_name):
         fileobj = io.BytesIO()
         s3.download_fileobj(bucket_name, filename, fileobj)
         fileobj.seek(0)
-        return StreamingResponse(fileobj, media_type="application/octet-stream")
+        return fileobj
     except ClientError as e:
         print(e)
         return None

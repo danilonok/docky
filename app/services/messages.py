@@ -1,25 +1,53 @@
 '''
 Service module for message operations
 '''
+from email import message
+
+from requests import session
 from app.models.chat import Chat
 from app.models.message import Message
 from app.models.user import User, UserDTO
-from app.dependencies.database import SessionDep
+from app.dependencies.database import SessionDep, get_session
 from typing import Annotated
 from fastapi import Query
-from sqlmodel import select
+from sqlmodel import Session, select
 from typing import List
 
 
 def add_message(content: str, chat_id: int, current_user: UserDTO, session: SessionDep) -> Message | None:
     '''Create a new message in the selected chat'''
+    '''Creates a user message and sends request to the worker to write a response'''
     chat = session.exec(select(Chat).where(Chat.id == chat_id)).first()
     user = session.exec(select(User).where(User.id == current_user.id)).first()
     if user and chat:
-        message = Message(content=content, chat=chat, user=user)
+        message = Message(content=content, chat=chat, user=user, agentic=False)
         session.add(message)
         session.commit()
         session.refresh(message)
+        return message
+    return None
+
+def add_agentic_message(chat_id: int, session: SessionDep, reply_to: int = None) -> int | None:
+    '''
+    Creates a new empty agentic messages which can be filled later by the worker.
+    Returns id of the new message
+    '''   
+    chat = session.exec(select(Chat).where(Chat.id == chat_id)).first()
+
+    if chat:
+        message = Message(content=None, agentic=True, finished=False, chat=chat, reply_to=reply_to)
+        session.add(message)
+        session.commit()
+        session.refresh(message)
+        return message.id
+    return None
+
+def finish_message(content: str, message_id: int):
+    session = next(get_session())
+    message = session.exec(select(Message).where(Message.id == message_id)).first()
+    if message:
+        message.finished = True
+        message.content = content
         return message
     return None
 
