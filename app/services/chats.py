@@ -11,6 +11,8 @@ from fastapi import Query
 from sqlmodel import select, any_
 from typing import List
 
+from app.tasks.tasks import upload_document, delete_all_documents
+
 from sqlalchemy.orm import selectinload
 # CRUD Operations for Users
 
@@ -69,4 +71,27 @@ def add_document_to_chat(session: SessionDep, documentId: int, chatId: int) -> C
         session.commit()
         session.refresh(chat)
 
+    # Add document to index
+    upload_document.delay(chat_id=chat.id, document_path=document.file_name)
+
     return chat
+
+def delete_documents_in_chat(session: SessionDep, chatId: int) -> Chat:
+    # Find chat
+    chat = session.exec(select(Chat).where(Chat.id == chatId)).first()
+    
+    if chat:
+        delete_all_documents.delay(chat_id=chat.id)
+
+        chat.documents.clear()
+        session.add(chat)
+        session.commit()
+        session.refresh(chat)
+
+        return chat
+
+def get_documents(session: SessionDep, chatId: int) -> list[Document]:
+    chat = session.exec(select(Chat).where(Chat.id == chatId)).first()
+    if chat:
+        return chat.documents
+    return None

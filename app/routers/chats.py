@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 
 from app.models.chat import Chat, ChatView
 from app.models.user import User, UserDTO
+from app.models.document import Document
 
 from typing import List, Annotated
 from app.dependencies.auth import get_current_active_user
@@ -27,9 +28,22 @@ async def add_chat(current_user: Annotated[UserDTO, Depends(get_current_active_u
     chat = chat_service.add_chat(current_user=current_user, session=session, title=title, user_ids=users)
     return chat
 
-@router.post("/chats/documents", tags=["chats"])
+@router.post("/chats/{chatId}/documents", tags=["chats"])
 async def add_document_to_chat(current_user: Annotated[UserDTO, Depends(get_current_active_user)], documentId: int, chatId: int, session: SessionDep) -> Chat:
     chat = chat_service.add_document_to_chat(session=session, chatId=chatId, documentId=documentId)
+    return chat
+
+@router.get("/chats/{chatId}/documents", tags=["chats"])
+async def get_documents_in_chat(current_user: Annotated[UserDTO, Depends(get_current_active_user)], chatId: int, session: SessionDep) -> list[Document]:
+    chat_docs = chat_service.get_documents(session=session, chatId=chatId)
+    if chat_docs:
+        return chat_docs
+    return None
+
+@router.delete("/chats/{chatId}/documents", tags=["chats"])
+async def delete_documents_in_chat(current_user: Annotated[UserDTO, Depends(get_current_active_user)], chatId: int, session: SessionDep) -> Chat:
+    chat = chat_service.delete_documents_in_chat(session=session, chatId=chatId)
+    
     return chat
 
 @router.delete("/chats", tags=["chats"])

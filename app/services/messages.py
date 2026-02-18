@@ -45,17 +45,22 @@ def add_agentic_message(chat_id: int, session: SessionDep, reply_to: int = None)
 def finish_message(content: str, message_id: int):
     session = next(get_session())
     message = session.exec(select(Message).where(Message.id == message_id)).first()
+    print(message)
     if message:
+        print(message)
         message.finished = True
         message.content = content
-        return message
+        session.add(message)
+        session.commit()
+        session.refresh(message)
+        return message.content
     return None
 
 def get_messages(session: SessionDep, chat_id: int, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> list[Message] | None:
     '''Get all messages from the chat'''
     chat = session.exec(select(Chat).where(Chat.id == chat_id)).first()
     if chat:
-        messages = session.exec(select(Message).where(Message.chat_id == chat.id).offset(offset).limit(limit)).all()
+        messages = session.exec(select(Message).where(Message.chat_id == chat.id).offset(offset).limit(limit).order_by(Message.created_at)).all()
         return list(messages)
     return None
 

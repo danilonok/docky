@@ -38,7 +38,11 @@ async def add_message(current_user: Annotated[UserDTO, Depends(get_current_activ
     if message:
         # Create a job
         agentic_message = message_service.add_agentic_message(chat_id=chat_id, reply_to=message.id, session=session)
-        query_index.delay(message.content, chat.id, agentic_message)
+        # Fetch all messages
+        all_messages = message_service.get_messages(chat_id=chat_id, session=session)
+        dict_messages = [{'type': 'agentic' if message.agentic else 'user', 'content': message.content} for message in all_messages]
+        
+        query_index.delay(message.content, chat.id, agentic_message, dict_messages)
     return message
 
 

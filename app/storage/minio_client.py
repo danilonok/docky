@@ -3,13 +3,16 @@ import io
 import boto3
 from botocore.exceptions import ClientError
 from fastapi.responses import StreamingResponse
+from dotenv import load_dotenv
+load_dotenv()
+
 
 
 s3 = boto3.client(
     "s3",
     endpoint_url=f"http://127.0.0.1:9000",
-    aws_access_key_id='minioadmin',
-    aws_secret_access_key='minioadmin',
+    aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
     region_name="us-east-1"
 )
 def create_bucket(bucket_name):

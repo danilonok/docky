@@ -9,10 +9,12 @@
 - [x] Document upload
 - [x] Simple task system with celery
 - [x] Add simple RAG functionality
+- [x] Add RAG-Chat functionality
+- [x] Chat history during inference
 
 ### Current tasks:
+- [ ] Showing best chunks from text
 
-- [ ] Add RAG-Chat functionality
 
 ### For later:
 - [ ] Fix chat deletion when one of the users gets deleted

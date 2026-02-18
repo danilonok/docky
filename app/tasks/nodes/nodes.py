@@ -1,4 +1,5 @@
 from importlib import metadata
+from httpx import delete
 from llama_index.core import VectorStoreIndex
 from app.dependencies.database import SessionDep
 from app.models.document import Document
@@ -22,11 +23,30 @@ from app.storage.minio_client import download_from_minio
 
 from docling.document_converter import DocumentConverter, DocumentStream
 from docling.chunking import HierarchicalChunker
+from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
+from docling_core.transforms.chunker.tokenizer.base import BaseTokenizer
+from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTokenizer
+from transformers import AutoTokenizer
+
+
 
 from llama_index.core.vector_stores.types import (
     MetadataFilter,
     MetadataFilters,
 )
+
+from llama_index.core.chat_engine import ContextChatEngine
+from llama_index.core.llms import ChatMessage, MessageRole
+
+from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+
+from phoenix.otel import register
+
+tracer_provider = register(project_name="llamaindex-tracing-tutorial", protocol="http/protobuf")
+LlamaIndexInstrumentor().instrument(
+    tracer_provider=tracer_provider,
+)
+
 
 Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url="http://localhost:11434")
 Settings.embed_model = OllamaEmbedding(model_name='embeddinggemma', request_timeout=120.0, base_url="http://localhost:11434")
@@ -45,7 +65,15 @@ index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
 
 converter = DocumentConverter()
-chunker = HierarchicalChunker()
+
+EMBED_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
+
+tokenizer: BaseTokenizer = HuggingFaceTokenizer(
+    tokenizer=AutoTokenizer.from_pretrained(EMBED_MODEL_ID),
+)
+chunker = HybridChunker(tokenizer=tokenizer)
+
+
 
 
 # When document is uploaded to chat, it should be added to the index
@@ -69,16 +97,45 @@ def add_document_to_index(document_path: str, chat_id: int):
     vector_store.add(nodes_with_embeddings)
     return True
 
-
-# Should return a JSON object with response and top-3 nodes
-# Also changes the content of the corresponding agentic message
-def query_rag(query: str, chat_id: int, message_id: int):
+# Deletes all nodes with metadata key chat_id
+def clear_documents_in_chat(chat_id: int):
+    # Get all nodes with chat_id
     filters = MetadataFilters(
         filters=[
             MetadataFilter(key="chat_id", value=chat_id)],
     )
-    query_engine = index.as_query_engine(filters=filters)
-    response = query_engine.query(query)
+
+    nodes = vector_store.get_nodes(node_ids=None, filters=filters)
+
+    node_ids = [node.node_id for node in nodes]
+
+    vector_store.delete_nodes(node_ids=node_ids)
+
+# Should return a JSON object with response and top-3 nodes
+# Also changes the content of the corresponding agentic message
+def query_rag(query: str, chat_id: int, message_id: int, messages: list[dict]):
+    filters = MetadataFilters(
+        filters=[
+            MetadataFilter(key="chat_id", value=chat_id)],
+    )
+    # chat_engine = index.as_chat_engine()
+    retriever = index.as_retriever(filters=filters)
+
+    # Create chat history from messages
+    custom_chat_history = []
+    for message in messages:
+        if message['type'] == 'agentic':
+            custom_chat_history.append(ChatMessage(role=MessageRole.ASSISTANT, content=message['content']))
+        else:
+            custom_chat_history.append(ChatMessage(role=MessageRole.USER, content=message['content']))
+
+    chat_engine = ContextChatEngine.from_defaults(
+        retriever=retriever,
+        chat_history=custom_chat_history,
+        )
+    # response = query_engine.query(query)
+    response = chat_engine.chat(query)
+
 
     nodes_for_output = []
     for node in response.source_nodes:
@@ -89,9 +146,9 @@ def query_rag(query: str, chat_id: int, message_id: int):
         'nodes': nodes_for_output
     }
     
-    finish_message(content=str(response), message_id=message_id)
+    message = finish_message(content=str(response), message_id=message_id)
 
-    return query_response
+    return message
 
 
 
