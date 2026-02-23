@@ -1,7 +1,7 @@
 name: CI
 on: [push]
 jobs:
-  uv-example: 
+  uv-install: 
     name: python
     runs-on: self-hosted
     steps:
@@ -10,3 +10,6 @@ jobs:
         uses: astral-sh/setup-uv@v7      
       - name: Set up Python
         run: uv python install
+      - name: sync
+        run: uv sync
+      
