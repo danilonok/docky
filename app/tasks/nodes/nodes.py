@@ -108,7 +108,7 @@ def add_summary(nodes: list[dict], chat_id: int):
     response_mode="tree_summarize",
     )
     response = summary_query_engine.query("Summarize the given document")
-    vector_store.add([TextNode(text=str(response), metadata={'chat_id': chat_id, 'node_type': 'summary'})])
+    vector_store.add(index._get_node_with_embedding([TextNode(text=str(response), metadata={'chat_id': chat_id, 'node_type': 'summary'})]))
 
 
     
