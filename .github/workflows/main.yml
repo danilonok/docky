@@ -4,6 +4,7 @@ jobs:
   docker-compose: 
     name: docker-compose
     runs-on: self-hosted
+    environment: CD
     env: 
       AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
