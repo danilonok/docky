@@ -209,3 +209,9 @@ __marimo__/
 
 # # Bruno - for now
 # bruno/
+
+# Test script
+test.py
+
+# All pdfs
+*.pdf

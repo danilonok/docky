@@ -1,6 +1,8 @@
 from importlib import metadata
+from io import BytesIO
 from httpx import delete
 from llama_index.core import VectorStoreIndex
+import requests
 from app.dependencies.database import SessionDep
 from app.models.document import Document
 
@@ -21,13 +23,6 @@ from app.services.messages import finish_message
 
 from app.storage.minio_client import download_from_minio
 
-from docling.document_converter import DocumentConverter, DocumentStream
-from docling.chunking import HierarchicalChunker
-from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
-from docling_core.transforms.chunker.tokenizer.base import BaseTokenizer
-from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTokenizer
-from transformers import AutoTokenizer
-
 
 
 from llama_index.core.vector_stores.types import (
@@ -38,25 +33,25 @@ from llama_index.core.vector_stores.types import (
 from llama_index.core.chat_engine import ContextChatEngine
 from llama_index.core.llms import ChatMessage, MessageRole
 
-from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+# from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
 
-from phoenix.otel import register
+# from phoenix.otel import register
 
-tracer_provider = register(project_name="llamaindex-tracing-tutorial", protocol="http/protobuf")
-LlamaIndexInstrumentor().instrument(
-    tracer_provider=tracer_provider,
-)
+# tracer_provider = register(project_name="llamaindex-tracing-tutorial", protocol="http/protobuf")
+# LlamaIndexInstrumentor().instrument(
+#     tracer_provider=tracer_provider,
+# )
 
 
-Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url="http://localhost:11434")
-Settings.embed_model = OllamaEmbedding(model_name='embeddinggemma', request_timeout=120.0, base_url="http://localhost:11434")
+Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url="http://ollama:11434")
+Settings.embed_model = OllamaEmbedding(model_name='embeddinggemma', request_timeout=120.0, base_url="http://ollama:11434")
 
 
 BUCKET_NAME = 'my-bucket'
 
 
 client = qdrant_client.QdrantClient(
-    "http://localhost:6333",
+    "http://qdrant:6333",
     api_key=None, # For Qdrant Cloud, None for local instance
 )
 
@@ -64,32 +59,63 @@ vector_store = QdrantVectorStore(client=client, collection_name="documents")
 index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
 
-converter = DocumentConverter()
+
 
 EMBED_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
 
-tokenizer: BaseTokenizer = HuggingFaceTokenizer(
-    tokenizer=AutoTokenizer.from_pretrained(EMBED_MODEL_ID),
-)
-chunker = HybridChunker(tokenizer=tokenizer)
 
 
 
+def get_chunks(filename, filestream: BytesIO):
+    url = "http://docling:5001/v1/chunk/hybrid/file"
+    filestream.seek(0)
 
+    files = [
+        ('files', (filename, filestream, 'application/pdf'))
+    ]
+
+    # 3. Request Parameters
+    data = {
+        "include_converted_doc": "true",
+        "convert_do_ocr": "true", # Set to false if you want it faster
+        "target_type": "inbody",
+        "chunking_merge_peers": "true"
+    }
+
+    try:
+        response = requests.post(url, files=files, data=data)
+        
+        if response.status_code == 200:
+            result = response.json()
+            doc = result['documents'][0]
+            
+            
+            if doc['status'] == 'success':
+                print(f"Successfully processed! Found {len(result['chunks'])} chunks.")
+                return result['chunks']
+            else:
+                print(f"Server rejected the file. Errors: {doc.get('errors')}")
+        else:
+            print(f"HTTP {response.status_code}: {response.text}")
+
+    except Exception as e:
+        print(f"Connection Error: {e}")
+
+
+    
 # When document is uploaded to chat, it should be added to the index
 def add_document_to_index(document_path: str, chat_id: int):
     # Get document file back from minio
     file = download_from_minio(filename=str(document_path), bucket_name=BUCKET_NAME)
 
     # Break it to chunks with docling
-    source = DocumentStream(name=document_path, stream=file)
-    result = converter.convert(source)
+    
+    chunks = get_chunks(str(document_path), file)
 
-    chunks = list(chunker.chunk(result.document))
 
     nodes = []
     for chunk in chunks:
-        node = TextNode(text=chunk.text, metadata={'chat_id': chat_id})
+        node = TextNode(text=chunk['text'], metadata={'chat_id': chat_id})
         nodes.append(node)
 
     nodes_with_embeddings = index._get_node_with_embedding(nodes)

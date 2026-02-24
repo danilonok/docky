@@ -71,6 +71,27 @@ services:
       - qdrant:/qdrant/storage
     restart: always
 
+  docling:
+    image: quay.io/docling-project/docling-serve
+    ports:
+      - "5001:5001"
+    environment:
+      - DOCLING_SERVE_ENABLE_UI=1
+  api:
+    build: .
+    ports:
+      - "8000:80"
+    env_file:
+      - .env
+
+  celery_worker:
+    build: .
+    command: celery -A app.tasks worker --loglevel=info -P solo
+    env_file: .env
+    depends_on:
+      - rabbitmq
+      - ollama
+      - docling
 volumes:
   pgdata:
   ollama:

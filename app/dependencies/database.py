@@ -1,8 +1,9 @@
 from sqlmodel import Session, SQLModel, create_engine
 from typing import Annotated
 from fastapi import Depends
+import os
 
-db_url = f"postgresql+psycopg2://postgres:password@localhost:5432/db"
+db_url = f"postgresql+psycopg2://{os.environ['POSTGRES_USER']}:{os.environ['POSTGRES_PASSWORD']}@db:5432/db"
 
 engine = create_engine(db_url)
 
