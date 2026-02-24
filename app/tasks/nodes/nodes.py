@@ -150,14 +150,11 @@ def clear_documents_in_chat(chat_id: int):
 
     vector_store.delete_nodes(node_ids=node_ids)
 
-# Should return a JSON object with response and top-3 nodes
-# Also changes the content of the corresponding agentic message
 def query_rag(query: str, chat_id: int, message_id: int, messages: list[dict]):
     filters = MetadataFilters(
         filters=[
             MetadataFilter(key="chat_id", value=chat_id)],
     )
-    # chat_engine = index.as_chat_engine()
     retriever = index.as_retriever(filters=filters)
 
     # Create chat history from messages
@@ -172,34 +169,14 @@ def query_rag(query: str, chat_id: int, message_id: int, messages: list[dict]):
         retriever=retriever,
         chat_history=custom_chat_history,
         )
-    # response = query_engine.query(query)
     response = chat_engine.chat(query)
 
 
     nodes_for_output = []
     for node in response.source_nodes:
-        nodes_for_output.append(str(node.node.get_content()))
+        nodes_for_output.append({'node': node.node.text, 'score': node.score })
 
-    query_response = {
-        'response': str(response),
-        'nodes': nodes_for_output
-    }
     
-    message = finish_message(content=str(response), message_id=message_id)
+    message = finish_message(content=str(response), message_id=message_id, source_nodes=nodes_for_output)
 
     return message
-
-
-
-    # To-DO: somehow get BytesIO into text chunks
-
-
-# 1: User adds new document to the service -> Break it down to nodes, mark as "their"
-
-
-# 2: Vectorize the whole bunch of nodes -> Bad at big scale, unuseful waste of resources, as many docs are not used all the time
-# OK for now, but maybe useful to store only the one in current use
-
-# Document gets processed as soon as it was added to any chat
-
-# 3: Tasks for retrieval -> User writes his prompt, which then is being processed by the QueryEngine. QueryEngine looks up only the nodes labeled with current user_id and chat_id

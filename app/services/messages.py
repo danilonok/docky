@@ -42,7 +42,7 @@ def add_agentic_message(chat_id: int, session: SessionDep, reply_to: int = None)
         return message.id
     return None
 
-def finish_message(content: str, message_id: int):
+def finish_message(content: str, message_id: int, source_nodes: list[dict]):
     session = next(get_session())
     message = session.exec(select(Message).where(Message.id == message_id)).first()
     print(message)
@@ -50,6 +50,7 @@ def finish_message(content: str, message_id: int):
         print(message)
         message.finished = True
         message.content = content
+        message.source_nodes = source_nodes
         session.add(message)
         session.commit()
         session.refresh(message)

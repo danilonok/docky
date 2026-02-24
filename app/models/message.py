@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel, Relationship, Column, JSON
 
 from datetime import datetime
 from pydantic import BaseModel
@@ -16,6 +16,11 @@ class Message(SQLModel, table=True):
     reply_to: int | None
     agentic: bool = False
     finished: bool = True
+    # For now - store the top-nodes as a simple JSON
+    source_nodes: List[dict] | None = Field(
+        default=None, 
+        sa_column=Column(JSON)
+    )
     user_id: int | None = Field(default=None, foreign_key="user.id", ondelete="CASCADE")
     user: User | None = Relationship(back_populates="messages")
 
