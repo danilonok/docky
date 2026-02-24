@@ -32,6 +32,6 @@ def delete_all_documents(chat_id: int):
     return result
 
 @app.task
-def add_summary_task(nodes: list[TextNode], chat_id: int):
+def add_summary_task(nodes: list[dict], chat_id: int):
     result = add_summary(nodes, chat_id=chat_id)
     return result

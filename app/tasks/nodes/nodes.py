@@ -101,8 +101,9 @@ def get_chunks(filename, filestream: BytesIO):
         print(f"Connection Error: {e}")
 
 
-def add_summary(nodes: list[TextNode], chat_id: int):
-    summary_index = SummaryIndex(nodes)
+def add_summary(nodes: list[dict], chat_id: int):
+    doc_nodes = [TextNode.from_dict(d) for d in nodes]
+    summary_index = SummaryIndex(doc_nodes)
     summary_query_engine = summary_index.as_query_engine(
     response_mode="tree_summarize",
     )
