@@ -81,13 +81,10 @@ services:
     build: .
     ports:
       - "8000:80"
-    env_file:
-      - .env
 
   celery_worker:
     build: .
     command: celery -A app.tasks worker --loglevel=info -P solo
-    env_file: .env
     depends_on:
       - rabbitmq
       - ollama
