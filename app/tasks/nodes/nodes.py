@@ -22,7 +22,6 @@ from app.services.messages import finish_message
 
 
 from app.storage.minio_client import download_from_minio
-from app.tasks.tasks import add_summary_task
 
 
 from llama_index.core.vector_stores.types import (
@@ -130,7 +129,10 @@ def add_document_to_index(document_path: str, chat_id: int):
     nodes_with_embeddings = index._get_node_with_embedding(nodes)
     # Chunks to text nodes
     vector_store.add(nodes_with_embeddings)
-    add_summary_task.delay(chunks, chat_id)
+    nodes_as_dicts = [node.dict() for node in nodes]
+    from app.tasks.tasks import add_summary_task
+
+    add_summary_task.delay(nodes_as_dicts, chat_id)
     return True
 
 # Deletes all nodes with metadata key chat_id
