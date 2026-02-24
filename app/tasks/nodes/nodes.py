@@ -1,7 +1,7 @@
 from importlib import metadata
 from io import BytesIO
 from httpx import delete
-from llama_index.core import VectorStoreIndex
+from llama_index.core import SummaryIndex, VectorStoreIndex
 import requests
 from app.dependencies.database import SessionDep
 from app.models.document import Document
@@ -22,7 +22,7 @@ from app.services.messages import finish_message
 
 
 from app.storage.minio_client import download_from_minio
-
+from app.tasks.tasks import add_summary_task
 
 
 from llama_index.core.vector_stores.types import (
@@ -102,6 +102,15 @@ def get_chunks(filename, filestream: BytesIO):
         print(f"Connection Error: {e}")
 
 
+def add_summary(nodes: list[TextNode], chat_id: int):
+    summary_index = SummaryIndex(nodes)
+    summary_query_engine = summary_index.as_query_engine(
+    response_mode="tree_summarize",
+    )
+    response = summary_query_engine.query("Summarize the given document")
+    vector_store.add([TextNode(text=str(response), metadata={'chat_id': chat_id, 'node_type': 'summary'})])
+
+
     
 # When document is uploaded to chat, it should be added to the index
 def add_document_to_index(document_path: str, chat_id: int):
@@ -121,6 +130,7 @@ def add_document_to_index(document_path: str, chat_id: int):
     nodes_with_embeddings = index._get_node_with_embedding(nodes)
     # Chunks to text nodes
     vector_store.add(nodes_with_embeddings)
+    add_summary_task.delay(chunks, chat_id)
     return True
 
 # Deletes all nodes with metadata key chat_id

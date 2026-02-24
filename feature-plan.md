@@ -13,6 +13,7 @@
 - [x] Chat history during inference
 
 ### Current tasks:
+- [ ] Add summarization for documents
 - [ ] Showing best chunks from text
 
 
