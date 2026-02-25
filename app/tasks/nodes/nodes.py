@@ -155,7 +155,7 @@ def query_rag(query: str, chat_id: int, message_id: int, messages: list[dict]):
         filters=[
             MetadataFilter(key="chat_id", value=chat_id)],
     )
-    retriever = index.as_retriever(filters=filters)
+    retriever = index.as_retriever(filters=filters, similarity_top_k=5)
 
     # Create chat history from messages
     custom_chat_history = []
