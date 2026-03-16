@@ -6,6 +6,9 @@ Docky is an open-source, full-stack application that lets you upload documents, 
 
 ---
 
+<img width="2778" height="1654" alt="image" src="https://github.com/user-attachments/assets/88f72888-c27e-44e9-a53a-6015326dfd68" />
+
+
 ## Features
 
 - **RAG-powered chat** - Ask questions about your documents and get context-aware answers with source references
