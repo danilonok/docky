@@ -16,6 +16,7 @@ jobs:
       OLLAMA_HOST: ${{secrets.OLLAMA_HOST}}
       QDRANT_HOST: ${{secrets.QDRANT_HOST}}
       DOCLING_HOST: ${{secrets.DOCLING_HOST}}
+      RABBIT_MQ_HOST: ${{ secrets.RABBIT_MQ_HOST }}
     steps:
       - uses: actions/checkout@v6
       - name: build-images
