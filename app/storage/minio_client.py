@@ -3,8 +3,6 @@ import io
 import boto3
 from botocore.exceptions import ClientError
 from fastapi.responses import StreamingResponse
-from dotenv import load_dotenv
-load_dotenv()
 
 
 

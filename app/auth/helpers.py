@@ -2,10 +2,6 @@ import os
 from pwdlib import PasswordHash
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
-from dotenv import load_dotenv
-
-
-load_dotenv()
 
 SECRET_KEY = os.getenv('AUTH_SECRET_KEY')
 ALGORITHM = "HS256"
