@@ -7,6 +7,7 @@ from app.dependencies.auth import get_current_active_user
 from app.dependencies.database import SessionDep
 
 from app.models.message import Message
+from app.schemas.message import MessageRead
 from app.schemas.user import UserRead
 from app.services import messages as message_service
 from app.services import chats as chats_service
@@ -15,7 +16,7 @@ from app.tasks.tasks import query_index
 router = APIRouter()
 
 
-@router.get("/messages", tags=["messages"], response_model=list[Message])
+@router.get("/messages", tags=["messages"], response_model=list[MessageRead])
 async def get_messages(current_user: Annotated[UserRead, Depends(get_current_active_user)], chat_id: int, session: SessionDep, offset: int = 0, limit: int = 100) -> List[Message] | None:
     # If user has this current chat
     chat = chats_service.get_chat_by_id(id=chat_id, session=session)
@@ -28,7 +29,7 @@ async def get_messages(current_user: Annotated[UserRead, Depends(get_current_act
     return messages
 
 
-@router.post("/messages", tags=["messages"], response_model=Message)
+@router.post("/messages", tags=["messages"], response_model=MessageRead)
 async def add_message(current_user: Annotated[UserRead, Depends(get_current_active_user)], chat_id: int, content: str, session: SessionDep) -> Message | None:
     # If user has this current chat
     chat = chats_service.get_chat_by_id(id=chat_id, session=session)
