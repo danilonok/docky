@@ -21,8 +21,7 @@ class DocumentUpdate(DocumentBase):
 
 class DocumentRead(DocumentBase):
     id: int
-    
-    user: "UserRead | None" = None
-    chats: list["ChatRead"] = []
+
+    user_id: int | None = None
 
     model_config = ConfigDict(from_attributes=True)

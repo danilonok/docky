@@ -49,7 +49,7 @@ async def add_message(current_user: Annotated[UserRead, Depends(get_current_acti
     return message
 
 
-@router.delete("/messages", tags=["messages"], response_model=Message)
+@router.delete("/messages", tags=["messages"], response_model=MessageRead)
 async def delete_message(current_user: Annotated[UserRead, Depends(get_current_active_user)], message_id: int, session: SessionDep) -> Message | None:
     # If user has this current message
     message = message_service.get_message_by_id(id=message_id, session=session)

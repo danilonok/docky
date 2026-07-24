@@ -27,8 +27,8 @@ class MessageUpdate(MessageBase):
 
 class MessageRead(MessageBase):
     id: int
-    
-    user: "UserRead" | None = None
-    chat: "ChatRead" | None = None
+
+    user_id: int | None = None
+    chat_id: int | None = None
 
     model_config = ConfigDict(from_attributes=True)

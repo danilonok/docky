@@ -31,6 +31,7 @@ from llama_index.core.vector_stores.types import (
 from llama_index.core.chat_engine import ContextChatEngine
 from llama_index.core.llms import ChatMessage, MessageRole
 
+import os
 # from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
 
 # from phoenix.otel import register
@@ -41,15 +42,15 @@ from llama_index.core.llms import ChatMessage, MessageRole
 # )
 
 
-Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url="http://ollama:11434")
-Settings.embed_model = OllamaEmbedding(model_name='embeddinggemma', request_timeout=120.0, base_url="http://ollama:11434")
+Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434")
+Settings.embed_model = OllamaEmbedding(model_name='embeddinggemma', request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434")
 
 
 BUCKET_NAME = 'my-bucket'
 
 
 client = qdrant_client.QdrantClient(
-    "http://qdrant:6333",
+    f"http://{os.environ.get('QDRANT_HOST')}:6333",
     api_key=None, # For Qdrant Cloud, None for local instance
 )
 
@@ -65,7 +66,7 @@ EMBED_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 def get_chunks(filename, filestream: BytesIO):
-    url = "http://docling:5001/v1/chunk/hybrid/file"
+    url = f"http://{os.environ.get('DOCLING_HOST')}:5001/v1/chunk/hybrid/file"
     filestream.seek(0)
 
     files = [

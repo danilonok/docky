@@ -14,8 +14,4 @@ class ChatUpdate(ChatBase):
 class ChatRead(ChatBase):
     id: int
 
-    users: list["UserRead"] = []
-    documents: list["DocumentRead"] = []
-    messages: list["MessageRead"] = []
-
     model_config = ConfigDict(from_attributes=True)

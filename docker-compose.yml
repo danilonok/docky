@@ -88,6 +88,10 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - POSTGRES_HOST=${POSTGRES_HOST}
+      - AWS_HOST=${AWS_HOST}
+      - OLLAMA_HOST=${OLLAMA_HOST}
+      - QDRANT_HOST=${QDRANT_HOST}
+      - DOCLING_HOST=${DOCLING_HOST}
 
   celery_worker:
     build: .
@@ -103,6 +107,10 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - POSTGRES_HOST=${POSTGRES_HOST}
+      - AWS_HOST=${AWS_HOST}
+      - OLLAMA_HOST=${OLLAMA_HOST}
+      - QDRANT_HOST=${QDRANT_HOST}
+      - DOCLING_HOST=${DOCLING_HOST}
 volumes:
   pgdata:
   ollama:

@@ -4,9 +4,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from pydantic import EmailStr
 
-from app.schemas.chat import ChatRead
-from app.schemas.document import DocumentRead
-
 
 class UserBase(BaseModel):
     email: EmailStr = Field(max_length=50)
@@ -24,6 +21,4 @@ class UserUpdate(UserBase):
 
 class UserRead(UserBase):
     id: int
-    chats: list[ChatRead] = []
-    documents: list[DocumentRead] = []
     model_config = ConfigDict(from_attributes=True)
