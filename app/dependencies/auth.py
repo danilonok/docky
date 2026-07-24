@@ -5,10 +5,10 @@ from app.dependencies.database import SessionDep
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
 
-from app.models.user import User, UserDTO
-
 from app.auth.helpers import verify_password, SECRET_KEY, ALGORITHM, oauth2_scheme, TokenData
 
+from app.models.user import User
+from app.schemas.user import UserRead
 from app.services.users import get_user_by_email
 
 
@@ -29,11 +29,12 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
+    # TODO: Check what the pylance issue this is
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep) -> UserDTO: 
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep) -> UserRead: 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -51,9 +52,9 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
     user = get_user_by_email(email=token_data.username, session=session)
     if user is None:
         raise credentials_exception
-    return UserDTO.model_validate(user)
+    return UserRead.model_validate(user)
 
-async def get_current_active_user(current_user: Annotated[UserDTO, Depends(get_current_user)]) -> UserDTO:
+async def get_current_active_user(current_user: Annotated[UserRead, Depends(get_current_user)]) -> UserRead:
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

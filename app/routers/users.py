@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app.models.user import User, UserRegistrationDTO, UserDTO
+
+from app.models.user import User
+from app.schemas.user import UserCreate, UserRead
+
 from app.services import users as user_service
 
 from app.dependencies.database import SessionDep
@@ -17,16 +20,16 @@ router = APIRouter()
 #     return users
 
 @router.get("/users/me", tags=["users"])
-async def get_current_user(current_user: Annotated[User, Depends(get_current_active_user)], session: SessionDep) -> UserDTO:
+async def get_current_user(current_user: Annotated[UserRead, Depends(get_current_active_user)], session: SessionDep) -> UserRead:
     user = current_user
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    return UserDTO.model_validate(user)
+    return UserRead.model_validate(user)
 
 
-@router.post("/users", tags=["users"])
-async def add_user(user: UserRegistrationDTO, session: SessionDep) -> UserDTO:
+@router.post("/users", tags=["users"], response_model=UserRead)
+async def add_user(user: UserCreate, session: SessionDep) -> User:
     # Check if the user with such email exists
 
     check_user = user_service.get_user_by_email(user.email, session)
@@ -37,8 +40,8 @@ async def add_user(user: UserRegistrationDTO, session: SessionDep) -> UserDTO:
 
     return created_user
 
-@router.delete("/users", tags=["users"])
-async def delete_user(current_user: Annotated[User, Depends(get_current_active_user)], user_id: int, session: SessionDep) -> UserDTO | None:
+@router.delete("/users", tags=["users"], response_model=UserRead)
+async def delete_user(current_user: Annotated[User, Depends(get_current_active_user)], user_id: int, session: SessionDep) -> User | None:
     # Check if the user exists
 
     user = user_service.get_user_by_id(id=user_id, session=session)

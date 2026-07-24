@@ -1,29 +1,31 @@
-from sqlmodel import Field, SQLModel, Relationship, Column, JSON
+from typing import TYPE_CHECKING
 
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.dialects.postgresql import JSONB
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.models.base import Base
 from datetime import datetime
-from pydantic import BaseModel
-from typing import List
-from app.models.chat import Chat
-from app.models.user import User
 
-class Message(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    content: str | None
-
-    chat_id: int | None = Field(default=None, foreign_key="chat.id", ondelete="CASCADE")
-    chat: Chat | None = Relationship(back_populates="messages")
-    created_at: datetime = Field(default_factory= lambda: datetime.now())
-    reply_to: int | None
-    agentic: bool = False
-    finished: bool = True
-    # For now - store the top-nodes as a simple JSON
-    source_nodes: List[dict] | None = Field(
-        default=None, 
-        sa_column=Column(JSON)
-    )
-    user_id: int | None = Field(default=None, foreign_key="user.id", ondelete="CASCADE")
-    user: User | None = Relationship(back_populates="messages")
+if TYPE_CHECKING:
+    from app.models.chat import Chat
+    from app.models.user import User
 
 
+class Message(Base):
+    __tablename__ = "message"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    content: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
+    reply_to: Mapped[int | None]
+    agentic: Mapped[bool]
+    finished: Mapped[bool]
 
+    source_nodes: Mapped[list[dict] | None] = mapped_column(JSONB, default=None)
+    
+    chat_id: Mapped[int | None] = mapped_column(ForeignKey("chat.id"))
+    chat: Mapped["Chat"] = relationship(back_populates="messages")
+
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship(back_populates="messages")

@@ -1,24 +1,28 @@
-from sqlmodel import Field, SQLModel, Relationship
-from pydantic import EmailStr
-from pydantic import BaseModel, ConfigDict
-from app.models.chat import ChatUserLink
+from typing import TYPE_CHECKING
 
-class User(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    email: EmailStr = Field(default=None, max_length=50)
-    password_hash: str | None = Field(default=None)
-    disabled: bool = False
+from sqlalchemy import ForeignKey, Column, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.models.base import Base
 
-    chats: list["Chat"] = Relationship(back_populates='users', link_model=ChatUserLink, sa_relationship_kwargs={"cascade": "all, delete"}) # type: ignore
-    messages: list["Message"] = Relationship(back_populates='user', cascade_delete=True) # type: ignore
-    documents: list["Document"] = Relationship(back_populates='user', cascade_delete=True) # type: ignore
+if TYPE_CHECKING:
+    from app.models.chat import Chat
+    from app.models.document import Document
+    from app.models.message import Message
 
-class UserDTO(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    email: EmailStr = Field(default=None, max_length=50)
-    disabled: bool = False
+user_chat = Table(
+    "user_chat",
+    Base.metadata,
+    Column("user.id", ForeignKey("user.id", ondelete="CASCADE"), primary_key=True),
+    Column("chat.id", ForeignKey("chat.id", ondelete="CASCADE"), primary_key=True),
+)
 
-class UserRegistrationDTO(BaseModel):
-    email: EmailStr = Field(default=None, max_length=50)
-    password: str = Field(default=None)
+class User(Base):
+    __tablename__ = "user"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+    password_hash: Mapped[str]
+    disabled: Mapped[bool]
+
+    chats: Mapped[list["Chat"]] = relationship(secondary=user_chat, back_populates="users")
+    messages: Mapped[list["Message"]] = relationship(back_populates="user")
+    documents: Mapped[list["Document"]] = relationship(back_populates='user')

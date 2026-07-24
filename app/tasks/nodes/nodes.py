@@ -4,7 +4,6 @@ from httpx import delete
 from llama_index.core import SummaryIndex, VectorStoreIndex
 import requests
 from app.dependencies.database import SessionDep
-from app.models.document import Document
 
 from llama_index.core import VectorStoreIndex
 
