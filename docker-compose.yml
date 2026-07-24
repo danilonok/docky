@@ -92,6 +92,7 @@ services:
       - OLLAMA_HOST=${OLLAMA_HOST}
       - QDRANT_HOST=${QDRANT_HOST}
       - DOCLING_HOST=${DOCLING_HOST}
+      - RABBIT_MQ_HOST=${RABBIT_MQ_HOST}
 
   celery_worker:
     build: .
@@ -111,6 +112,7 @@ services:
       - OLLAMA_HOST=${OLLAMA_HOST}
       - QDRANT_HOST=${QDRANT_HOST}
       - DOCLING_HOST=${DOCLING_HOST}
+      - RABBIT_MQ_HOST=${RABBIT_MQ_HOST}
 volumes:
   pgdata:
   ollama:
