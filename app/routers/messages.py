@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Response, status
 
 
 
@@ -49,14 +49,14 @@ async def add_message(current_user: Annotated[UserRead, Depends(get_current_acti
     return message
 
 
-@router.delete("/messages", tags=["messages"], response_model=MessageRead)
-async def delete_message(current_user: Annotated[UserRead, Depends(get_current_active_user)], message_id: int, session: SessionDep) -> Message | None:
+@router.delete("/messages", tags=["messages"])
+async def delete_message(current_user: Annotated[UserRead, Depends(get_current_active_user)], message_id: int, session: SessionDep) -> Response:
     # If user has this current message
     message = message_service.get_message_by_id(id=message_id, session=session)
     if not message: raise HTTPException(status_code=404, detail="Message not found")
     if not message.user_id == current_user.id:
         raise HTTPException(status_code=403, detail="No permission to do that")
-    
 
-    message = message_service.delete_message_by_id(message_id=message_id, session=session)
-    return message
+
+    message_service.delete_message_by_id(message_id=message_id, session=session)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

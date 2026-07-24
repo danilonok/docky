@@ -15,12 +15,12 @@ if TYPE_CHECKING:
 class Message(Base):
     __tablename__ = "message"
     id: Mapped[int] = mapped_column(primary_key=True)
-    content: Mapped[str]
+    content: Mapped[str | None] = mapped_column(default=None)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     reply_to: Mapped[int | None]
-    agentic: Mapped[bool]
-    finished: Mapped[bool]
+    agentic: Mapped[bool] = mapped_column(default=False)
+    finished: Mapped[bool] = mapped_column(default=True)
 
     source_nodes: Mapped[list[dict] | None] = mapped_column(JSONB, default=None)
     

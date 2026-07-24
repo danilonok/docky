@@ -42,7 +42,7 @@ import os
 # )
 
 
-Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434")
+Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434", context_window=4000)
 Settings.embed_model = OllamaEmbedding(model_name='embeddinggemma', request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434")
 
 

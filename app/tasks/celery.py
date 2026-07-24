@@ -1,7 +1,8 @@
 from celery import Celery
+import os
 
 app = Celery('proj',
-             broker='amqp://rabbitmq:5672/',
+             broker=f'amqp://{os.environ.get('RABBIT_MQ_HOST')}:5672/',
              backend="rpc://",
              include=['app.tasks.tasks'])
 

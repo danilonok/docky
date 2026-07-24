@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class MessageBase(BaseModel):
-    content : str
+    content : str | None
     created_at: datetime
     reply_to: int | None = None
     agentic: bool

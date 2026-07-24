@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Response, status
 
 from app.models.user import User
 from app.schemas.user import UserCreate, UserRead
@@ -40,15 +40,15 @@ async def add_user(user: UserCreate, session: SessionDep) -> User:
 
     return created_user
 
-@router.delete("/users", tags=["users"], response_model=UserRead)
-async def delete_user(current_user: Annotated[User, Depends(get_current_active_user)], user_id: int, session: SessionDep) -> User | None:
+@router.delete("/users", tags=["users"])
+async def delete_user(current_user: Annotated[User, Depends(get_current_active_user)], user_id: int, session: SessionDep) -> Response:
     # Check if the user exists
 
     user = user_service.get_user_by_id(id=user_id, session=session)
     if not user:
         raise HTTPException(status_code=404, detail="User does not exists")
     if not user.id == current_user.id: raise HTTPException(status_code=403, detail="Not enough permissions")
-    
-    user = user_service.delete_user_by_id(user_id=user_id, session=session)
 
-    return user
+    user_service.delete_user_by_id(user_id=user_id, session=session)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
