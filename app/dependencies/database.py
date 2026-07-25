@@ -14,11 +14,6 @@ db_url = f"postgresql+psycopg2://{os.environ['POSTGRES_USER']}:{os.environ['POST
 engine = create_engine(db_url)
 
 
-
-
-def create_db_and_tables():
-    Base.metadata.create_all(engine)
-
 def get_session():
     with Session(engine) as session:
         yield session

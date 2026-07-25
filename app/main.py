@@ -1,6 +1,5 @@
 from fastapi import Depends, FastAPI,  HTTPException, status
 from contextlib import asynccontextmanager
-from app.dependencies.database import create_db_and_tables
 
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
@@ -17,7 +16,6 @@ from app.dependencies.auth import authenticate_user, create_access_token
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    create_db_and_tables()
     yield
 
 
