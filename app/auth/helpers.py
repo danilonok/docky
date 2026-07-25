@@ -3,7 +3,7 @@ from pwdlib import PasswordHash
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
-SECRET_KEY = os.getenv('AUTH_SECRET_KEY')
+SECRET_KEY = os.environ['AUTH_SECRET_KEY']
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

@@ -25,8 +25,7 @@ def add_user(userCreate: UserCreate, session: SessionDep) -> User:
 
 def get_users(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> list[User] | None:
     users = session.scalars(select(User).offset(offset).limit(limit)).all()
-    # TODO: Fix the pylance error
-    return users
+    return list(users)
 
 def get_user_by_id(id: int, session: SessionDep) -> User | None:
     user = session.scalars(select(User).where(User.id == id)).first()

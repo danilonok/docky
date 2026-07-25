@@ -32,15 +32,6 @@ from llama_index.core.chat_engine import ContextChatEngine
 from llama_index.core.llms import ChatMessage, MessageRole
 
 import os
-# from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
-
-# from phoenix.otel import register
-
-# tracer_provider = register(project_name="llamaindex-tracing-tutorial", protocol="http/protobuf")
-# LlamaIndexInstrumentor().instrument(
-#     tracer_provider=tracer_provider,
-# )
-
 
 Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434", context_window=4000)
 Settings.embed_model = OllamaEmbedding(model_name='embeddinggemma', request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434")
@@ -57,12 +48,7 @@ client = qdrant_client.QdrantClient(
 vector_store = QdrantVectorStore(client=client, collection_name="documents")
 index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
-
-
-
 EMBED_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
-
-
 
 
 def get_chunks(filename, filestream: BytesIO):
@@ -73,10 +59,9 @@ def get_chunks(filename, filestream: BytesIO):
         ('files', (filename, filestream, 'application/pdf'))
     ]
 
-    # 3. Request Parameters
     data = {
         "include_converted_doc": "true",
-        "convert_do_ocr": "true", # Set to false if you want it faster
+        "convert_do_ocr": "true",
         "target_type": "inbody",
         "chunking_merge_peers": "true"
     }
@@ -116,11 +101,13 @@ def add_summary(nodes: list[dict], chat_id: int):
 def add_document_to_index(document_path: str, chat_id: int):
     # Get document file back from minio
     file = download_from_minio(filename=str(document_path), bucket_name=BUCKET_NAME)
-
+    if not file:
+        return False
     # Break it to chunks with docling
     
     chunks = get_chunks(str(document_path), file)
-
+    if not chunks:
+        return False
 
     nodes = []
     for chunk in chunks:

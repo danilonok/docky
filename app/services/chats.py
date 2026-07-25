@@ -42,13 +42,6 @@ def get_chat_by_id(id: int, session: SessionDep) -> Chat | None:
     '''Get a particular chat by the id'''
     chat = session.scalars(select(Chat).where(Chat.id == id)
                         ).first()
-
-    # TODO: Chat should also retrieve messages and etc
-
-    # chatView = ChatView.model_validate(chat)
-    # chatView.document_ids = [x.id for x in chat.documents]
-    # chatView.user_ids = [x.id for x in chat.users]
-    # chatView.messages_ids = [x.id for x in chat.messages]
     
     return chat
 

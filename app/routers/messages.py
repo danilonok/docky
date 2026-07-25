@@ -43,6 +43,8 @@ async def add_message(current_user: Annotated[UserRead, Depends(get_current_acti
         agentic_message = message_service.add_agentic_message(chat_id=chat_id, reply_to=message.id, session=session)
         # Fetch all messages
         all_messages = message_service.get_messages(chat_id=chat_id, session=session)
+        if not all_messages:
+            raise HTTPException(status_code=404, detail="Chat not found")
         dict_messages = [{'type': 'agentic' if message.agentic else 'user', 'content': message.content} for message in all_messages]
         
         query_index.delay(message.content, chat.id, agentic_message, dict_messages)
