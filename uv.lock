@@ -728,6 +728,7 @@ name = "docky"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "alembic" },
     { name = "arize-phoenix" },
     { name = "boto3" },
     { name = "celery" },
@@ -746,6 +747,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "alembic", specifier = ">=1.18.4" },
     { name = "arize-phoenix", extras = ["evals"], specifier = ">=13.0.3" },
     { name = "boto3", specifier = ">=1.42.26" },
     { name = "celery", specifier = ">=5.6.2" },

@@ -1,14 +1,23 @@
-from sqlmodel import Session, SQLModel, create_engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
+
 from typing import Annotated
 from fastapi import Depends
+from sqlalchemy.orm import DeclarativeBase
+
 import os
 
-db_url = f"postgresql+psycopg2://{os.environ['POSTGRES_USER']}:{os.environ['POSTGRES_PASSWORD']}@db:5432/db"
+from app.models import Base
+
+db_url = f"postgresql+psycopg2://{os.environ['POSTGRES_USER']}:{os.environ['POSTGRES_PASSWORD']}@{os.environ['POSTGRES_HOST']}:5432/db"
 
 engine = create_engine(db_url)
 
+
+
+
 def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+    Base.metadata.create_all(engine)
 
 def get_session():
     with Session(engine) as session:
