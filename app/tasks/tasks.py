@@ -1,18 +1,5 @@
-from llama_index.core.schema import TextNode
-
-from app.dependencies.database import SessionDep
-
 from app.tasks.celery import app
-
 from app.tasks.nodes.nodes import add_document_to_index, query_rag, clear_documents_in_chat, add_summary
-
-from llama_index.core import Settings
-
-
-@app.task
-def generate(prompt: str):
-    result = Settings.llm.complete(prompt)
-    return result.text
 
 @app.task
 def upload_document(document_path: str, chat_id: int):

@@ -1,1 +1,0 @@
-celery -A app.tasks worker -l INFO -P solo
