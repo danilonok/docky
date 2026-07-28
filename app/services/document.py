@@ -7,6 +7,7 @@ import uuid
 
 from fastapi import UploadFile
 
+from app.models import document
 from app.models.document import Document
 from app.dependencies.database import SessionDep
 from app.storage.minio_client import upload_to_minio
@@ -39,13 +40,18 @@ def add_document(file: UploadFile, current_user: UserRead, session: SessionDep) 
     session.refresh(document)
     return document
 
+def get_document(documentId: int, session: SessionDep) -> Document | None:
+    """Get a single document by its id"""
+    document = session.scalars(select(Document).where(Document.id == documentId)).first()
+    return document
+
 def get_documents(current_user: UserRead, session: SessionDep, offset: int = 0, limit: int = 100) -> list[Document]:
     '''Get all documents of the current user'''
     documents = session.scalars(select(Document).where(Document.user_id == current_user.id).offset(offset).limit(limit)).all()
     return list(documents)
 
 def add_document_to_index(document_id: int, chat_id: int, current_user: UserRead, session: SessionDep) -> str | None:
-    document = session.scalars(select(Document).where(Document.id == document_id and Document.user_id == current_user.id)).first()
+    document = session.scalars(select(Document).where((Document.id == document_id) & (Document.user_id == current_user.id))).first()
     if not document:
         return None
     res = upload_document.delay(document.file_name, chat_id)
