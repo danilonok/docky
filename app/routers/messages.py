@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends, Response, status
+from fastapi import APIRouter, HTTPException, Depends, Request, Response, status
 
 
 
 from typing import List, Annotated
+from app.dependencies.limiter import limiter
 from app.dependencies.auth import get_current_active_user
 from app.dependencies.authorization import ChatDep, OwnedMessageDep
 from app.dependencies.database import SessionDep
@@ -24,7 +25,8 @@ async def get_messages(chat: ChatDep, session: SessionDep, offset: int = 0, limi
 
 
 @router.post("/messages", tags=["messages"], response_model=MessageRead)
-async def add_message(chat: ChatDep, current_user: Annotated[UserRead, Depends(get_current_active_user)], content: str, session: SessionDep) -> Message | None:    
+@limiter.limit("5/minute")
+async def add_message(request: Request, chat: ChatDep, current_user: Annotated[UserRead, Depends(get_current_active_user)], content: str, session: SessionDep) -> Message | None:    
     message = message_service.add_message(chat=chat, content=content, session=session, current_user=current_user)
     if message:
         # Create a job

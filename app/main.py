@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 
+from fastapi import Request
+
 from app.dependencies.database import SessionDep
 
 from .routers import users, chats, messages, tasks, documents
@@ -15,13 +17,24 @@ from app.dependencies.auth import authenticate_user, create_access_token
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
+from app.dependencies.limiter import limiter
+
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
 
 
+
 app = FastAPI(lifespan=lifespan)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 origins = [
     "http://localhost",
@@ -51,7 +64,9 @@ async def root():
     return {"message": "Hello Bigger Applications!"}
 
 @app.post("/token", tags=["auth"])
+@limiter.limit("5/minute")
 async def login_for_access_token(
+    request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: SessionDep
 ) -> Token:

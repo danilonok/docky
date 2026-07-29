@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends, Response, status
+from fastapi import APIRouter, HTTPException, Depends, Request, Response, status
 
 
 from typing import List, Annotated
+from app.dependencies.limiter import limiter
 from app.dependencies.auth import get_current_active_user
 from app.dependencies.authorization import ChatDep, OwnedDocumentDep
 from app.dependencies.database import SessionDep
@@ -33,7 +34,8 @@ async def add_chat(current_user: Annotated[UserRead, Depends(get_current_active_
     return chat
 
 @router.post("/chats/{chatId}/documents", tags=["chats"], response_model=ChatRead)
-async def add_document_to_chat(chat: ChatDep, document: OwnedDocumentDep, session: SessionDep) -> Chat:
+@limiter.limit("10/minute")
+async def add_document_to_chat(request: Request, chat: ChatDep, document: OwnedDocumentDep, session: SessionDep) -> Chat:
     return chat_service.add_document_to_chat(session=session, chat=chat, document=document)
 
 
