@@ -25,7 +25,7 @@ def add_message(content: str, chat: Chat, current_user: UserRead, session: Sessi
     '''Create a new message in the selected chat'''
     '''Creates a user message and sends request to the worker to write a response'''
     
-    message = Message(content=content, chat=chat, user=current_user, agentic=False)
+    message = Message(content=content, chat=chat, user_id=current_user.id, agentic=False)
     session.add(message)
     session.commit()
     session.refresh(message)
