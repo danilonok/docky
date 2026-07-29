@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Depends, Response, status
 
 from typing import List, Annotated
 from app.dependencies.auth import get_current_active_user
-from app.dependencies.authorization import ChatDep
+from app.dependencies.authorization import ChatDep, OwnedMessageDep
 from app.dependencies.database import SessionDep
 
 from app.models.message import Message
@@ -38,13 +38,6 @@ async def add_message(chat: ChatDep, current_user: Annotated[UserRead, Depends(g
 
 
 @router.delete("/messages", tags=["messages"])
-async def delete_message(current_user: Annotated[UserRead, Depends(get_current_active_user)], message_id: int, session: SessionDep) -> Response:
-    # If user has this current message
-    message = message_service.get_message_by_id(id=message_id, session=session)
-    if not message: raise HTTPException(status_code=404, detail="Message not found")
-    if not message.user_id == current_user.id:
-        raise HTTPException(status_code=403, detail="No permission to do that")
-
-
-    message_service.delete_message_by_id(message_id=message_id, session=session)
+async def delete_message(current_user: Annotated[UserRead, Depends(get_current_active_user)], message: OwnedMessageDep, session: SessionDep) -> Response:
+    message_service.delete_message_by_id(message_id=message.id, session=session)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
