@@ -1,6 +1,6 @@
 # Docky
 
-**Chat with your documents using local AI — fully self-hosted, privacy-first RAG platform.**
+**Chat with your documents using local AI – fully self-hosted, privacy-first RAG platform.**
 
 Docky is an open-source, full-stack application that lets you upload documents, index them into a vector database, and have intelligent conversations about their content - all powered by local LLMs running on your own hardware. No data leaves your machine.
 
