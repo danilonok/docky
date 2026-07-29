@@ -113,22 +113,22 @@ export async function createChat(title, userIds = []) {
 }
 
 export async function deleteChat(chatId) {
-    return request(`/chats?chat_id=${chatId}`, { method: 'DELETE' });
+    return request(`/chats/${chatId}`, { method: 'DELETE' });
 }
 
 // ── Messages ──────────────────────────────────────────
 export async function getMessages(chatId, offset = 0, limit = 100) {
-    return request(`/messages?chat_id=${chatId}&offset=${offset}&limit=${limit}`, { method: 'GET' });
+    return request(`/messages?chatId=${chatId}&offset=${offset}&limit=${limit}`, { method: 'GET' });
 }
 
 export async function sendMessage(chatId, content) {
-    return request(`/messages?chat_id=${chatId}&content=${encodeURIComponent(content)}`, {
+    return request(`/messages?chatId=${chatId}&content=${encodeURIComponent(content)}`, {
         method: 'POST',
     });
 }
 
 export async function deleteMessage(messageId) {
-    return request(`/messages?message_id=${messageId}`, { method: 'DELETE' });
+    return request(`/messages?messageId=${messageId}`, { method: 'DELETE' });
 }
 
 // ── Documents ─────────────────────────────────────────

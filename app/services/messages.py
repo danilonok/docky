@@ -16,34 +16,34 @@ from app.models.message import Message
 from app.models.user import User
 from app.schemas.user import UserRead
 
+# How many recent messages to replay as LLM chat history. Kept well under the
+# model's context window so retrieved document chunks still fit alongside it.
+HISTORY_LIMIT = 20
 
-def add_message(content: str, chat_id: int, current_user: UserRead, session: SessionDep) -> Message | None:
+
+def add_message(content: str, chat: Chat, current_user: UserRead, session: SessionDep) -> Message | None:
     '''Create a new message in the selected chat'''
     '''Creates a user message and sends request to the worker to write a response'''
-    chat = session.scalars(select(Chat).where(Chat.id == chat_id)).first()
-    user = session.scalars(select(User).where(User.id == current_user.id)).first()
-    if user and chat:
-        message = Message(content=content, chat=chat, user=user, agentic=False)
-        session.add(message)
-        session.commit()
-        session.refresh(message)
-        return message
-    return None
+    
+    message = Message(content=content, chat=chat, user_id=current_user.id, agentic=False)
+    session.add(message)
+    session.commit()
+    session.refresh(message)
+    return message
 
-def add_agentic_message(chat_id: int, session: SessionDep, reply_to: int | None = None) -> int | None:
+
+def add_agentic_message(chat: Chat, session: SessionDep, reply_to: int | None = None) -> int | None:
     '''
     Creates a new empty agentic messages which can be filled later by the worker.
     Returns id of the new message
     '''   
-    chat = session.scalars(select(Chat).where(Chat.id == chat_id)).first()
 
-    if chat:
-        message = Message(content=None, agentic=True, finished=False, chat=chat, reply_to=reply_to)
-        session.add(message)
-        session.commit()
-        session.refresh(message)
-        return message.id
-    return None
+    message = Message(content=None, agentic=True, finished=False, chat=chat, reply_to=reply_to)
+    session.add(message)
+    session.commit()
+    session.refresh(message)
+    return message.id
+
 
 def finish_message(content: str, message_id: int, source_nodes: list[dict]):
     session = next(get_session())
@@ -60,13 +60,29 @@ def finish_message(content: str, message_id: int, source_nodes: list[dict]):
         return message.content
     return None
 
-def get_messages(session: SessionDep, chat_id: int, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> list[Message] | None:
+def get_messages(session: SessionDep, chat: Chat, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> list[Message]:
     '''Get all messages from the chat'''
-    chat = session.scalars(select(Chat).where(Chat.id == chat_id)).first()
-    if chat:
-        messages = session.scalars(select(Message).where(Message.chat_id == chat.id).offset(offset).limit(limit).order_by(Message.created_at)).all()
-        return list(messages)
-    return None
+    messages = session.scalars(select(Message).where(Message.chat_id == chat.id).offset(offset).limit(limit).order_by(Message.created_at)).all()
+    return list(messages)
+
+
+def get_history(session: SessionDep, chat: Chat, limit: int = HISTORY_LIMIT) -> list[Message]:
+    '''
+    Get the most recent messages of the chat, returned oldest-first.
+
+    Unlike get_messages, which pages forward from the start of the chat, this
+    takes the newest `limit` messages so that long chats keep their recent
+    context instead of replaying their opening turns.
+    '''
+    recent = session.scalars(
+        select(Message)
+        .where(Message.chat_id == chat.id)
+        .order_by(Message.created_at.desc(), Message.id.desc())
+        .limit(limit)
+    ).all()
+    # Reverse back into chronological order for the LLM.
+    return list(reversed(recent))
+
 
 def get_message_by_id(id: int, session: SessionDep) -> Message | None:
     '''Get a particular message by the id'''

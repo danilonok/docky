@@ -23,7 +23,7 @@ async def add_task_add_document_to_index(current_user: Annotated[UserRead, Depen
     return task_id
 
 @router.get('/add_document_to_index', tags=['tasks'])
-async def get_task_add_document_to_index(task_id: str):
+async def get_task_add_document_to_index(task_id: str, current_user: Annotated[UserRead, Depends(get_current_active_user)]):
     result = AsyncResult(task_id, app=app)
     if result.state == 'SUCCESS':
         return result.get()

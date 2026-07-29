@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Column, Table
+from sqlalchemy import DateTime, ForeignKey, Column, Table, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
@@ -22,6 +23,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(unique=True, index=True)
     password_hash: Mapped[str]
     disabled: Mapped[bool]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     chats: Mapped[list["Chat"]] = relationship(secondary=user_chat, back_populates="users")
     messages: Mapped[list["Message"]] = relationship(back_populates="user")

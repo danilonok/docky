@@ -56,45 +56,22 @@ def delete_chat_by_id(session: SessionDep, chat_id: int) -> Chat | None:
     return chat
 
 
-def add_document_to_chat(session: SessionDep, documentId: int, chatId: int) -> Chat | None:
-    # Find chat
-    chat = session.scalars(select(Chat).where(Chat.id == chatId)).first()
-    if not chat:
-        return None
-    
-    # Find document
-    document = session.scalars(select(Document).where(Document.id == documentId)).first()
-
-    if not document:
-        return None
-    
+def add_document_to_chat(session: SessionDep, document: Document, chat: Chat) -> Chat:
+    '''Attach an already-authorized document to an already-authorized chat'''
     if document not in chat.documents:
         chat.documents.append(document)
-        session.add(chat)
         session.commit()
-        session.refresh(chat)
-
-    # Add document to index
-    upload_document.delay(chat_id=chat.id, document_path=document.file_name)
+        # Add document to index
+        upload_document.delay(chat_id=chat.id, document_path=document.file_name)
 
     return chat
 
-def delete_documents_in_chat(session: SessionDep, chatId: int) -> Chat | None:
-    # Find chat
-    chat = session.scalars(select(Chat).where(Chat.id == chatId)).first()
-    
-    if chat:
-        delete_all_documents.delay(chat_id=chat.id)
-
-        chat.documents.clear()
-        session.add(chat)
-        session.commit()
-        session.refresh(chat)
-
-        return chat
-
-def get_documents(session: SessionDep, chatId: int) -> list[Document] | None:
-    chat = session.scalars(select(Chat).where(Chat.id == chatId)).first()
-    if chat:
-        return chat.documents
+def clear_documents_in_chat(session: SessionDep, chat: Chat) -> None:
+    chat.documents.clear()
+    session.commit()
+    delete_all_documents.delay(chat_id=chat.id)
     return None
+
+def get_documents(chat: Chat) -> list[Document]:
+    '''Get all documents attached to an already-authorized chat'''
+    return chat.documents
