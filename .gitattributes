@@ -1,0 +1,8 @@
+# Docky is a Python backend; the React frontend is a bundled client.
+# Excluding it from Linguist keeps the repo's reported language accurate.
+frontend/** linguist-vendored
+
+# Generated artifacts - not hand-written source.
+uv.lock                        linguist-generated
+frontend/openapi.json          linguist-generated
+frontend/app/package-lock.json linguist-generated
