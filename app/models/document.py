@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Column, Table
+from sqlalchemy import DateTime, ForeignKey, Column, Table, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
@@ -17,6 +18,7 @@ class Document(Base):
     original_file_name: Mapped[str]
     extension: Mapped[str]
     file_name: Mapped[str]
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     chats: Mapped[list["Chat"]] = relationship(secondary=chat_document, back_populates="documents")
 

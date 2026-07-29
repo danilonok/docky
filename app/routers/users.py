@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Response, status
+from fastapi import APIRouter, HTTPException, Depends, Response, status, Request
 
 from app.models.user import User
 from app.schemas.user import UserCreate, UserRead
@@ -10,6 +10,8 @@ from app.dependencies.database import SessionDep
 from app.dependencies.auth import get_current_active_user
 
 from typing import Annotated
+from app.dependencies.limiter import limiter
+
 
 router = APIRouter()
 
@@ -29,7 +31,8 @@ async def get_current_user(current_user: Annotated[UserRead, Depends(get_current
 
 
 @router.post("/users", tags=["users"], response_model=UserRead)
-async def add_user(user: UserCreate, session: SessionDep) -> User:
+@limiter.limit("3/minute")
+async def add_user(request: Request, user: UserCreate, session: SessionDep) -> User:
     # Check if the user with such email exists
 
     check_user = user_service.get_user_by_email(user.email, session)
