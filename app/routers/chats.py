@@ -14,7 +14,6 @@ from app.schemas.user import UserRead
 from app.services import chats as chat_service
 router = APIRouter()
 
-# TODO: Check if everything's fine
 @router.get("/chats", tags=["chats"], response_model=list[ChatRead])
 async def get_chats(current_user: Annotated[UserRead, Depends(get_current_active_user)], session: SessionDep, offset: int = 0, limit: int = 100) -> List[Chat] | None:
     chats = chat_service.get_chats(current_user=current_user, limit=limit, offset=offset, session=session)

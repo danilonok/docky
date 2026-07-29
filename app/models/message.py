@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.dialects.postgresql import JSONB
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -16,7 +16,7 @@ class Message(Base):
     __tablename__ = "message"
     id: Mapped[int] = mapped_column(primary_key=True)
     content: Mapped[str | None] = mapped_column(default=None)
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     reply_to: Mapped[int | None]
     agentic: Mapped[bool] = mapped_column(default=False)
