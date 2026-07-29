@@ -17,6 +17,8 @@ jobs:
       QDRANT_HOST: ${{secrets.QDRANT_HOST}}
       DOCLING_HOST: ${{secrets.DOCLING_HOST}}
       RABBIT_MQ_HOST: ${{ secrets.RABBIT_MQ_HOST }}
+      MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+      MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
     steps:
       - uses: actions/checkout@v6
       - name: build-images
