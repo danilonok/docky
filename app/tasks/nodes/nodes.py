@@ -3,7 +3,7 @@ from io import BytesIO
 from httpx import delete
 from llama_index.core import SummaryIndex, VectorStoreIndex
 import requests
-from app.dependencies.database import SessionDep
+from app.dependencies.database import SessionDep, session_scope
 
 from llama_index.core import VectorStoreIndex
 
@@ -33,7 +33,7 @@ from llama_index.core.llms import ChatMessage, MessageRole
 
 import os
 
-Settings.llm = Ollama(model="gemma3:4b", request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434", context_window=4000)
+Settings.llm = Ollama(model="gemma3:1b-it-q4_K_M", request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434", context_window=4000)
 Settings.embed_model = OllamaEmbedding(model_name='embeddinggemma', request_timeout=120.0, base_url=f"http://{os.environ.get('OLLAMA_HOST')}:11434")
 
 
@@ -163,7 +163,7 @@ def query_rag(query: str, chat_id: int, message_id: int, messages: list[dict]):
     for node in response.source_nodes:
         nodes_for_output.append({'node': node.node.text, 'score': node.score })
 
-    
-    message = finish_message(content=str(response), message_id=message_id, source_nodes=nodes_for_output)
+    with session_scope() as session:
+        message = finish_message(session=session, content=str(response), message_id=message_id, source_nodes=nodes_for_output)
 
     return message

@@ -8,6 +8,7 @@ from app.dependencies.database import SessionDep, get_session
 from typing import Annotated
 from fastapi import Query
 from typing import List
+from sqlalchemy.orm import Session
 
 from sqlalchemy import select
 
@@ -45,8 +46,7 @@ def add_agentic_message(chat: Chat, session: SessionDep, reply_to: int | None = 
     return message.id
 
 
-def finish_message(content: str, message_id: int, source_nodes: list[dict]):
-    session = next(get_session())
+def finish_message(session: Session, content: str, message_id: int, source_nodes: list[dict]):
     message = session.scalars(select(Message).where(Message.id == message_id)).first()
     print(message)
     if message:
