@@ -136,11 +136,13 @@ model there if your hardware allows, and pull whatever you point it at.
 
 Three things are not yet automated and have to be done once.
 
-**1. Create the application database.** The app connects to a database named `remindme`
-([database.py:22](app/dependencies/database.py#L22)), which Postgres does not create for you:
+**1. Create the application database.** Both the app
+([database.py:22](app/dependencies/database.py#L22)) and Alembic
+([env.py:13](alembic/env.py#L13)) connect to a database named `db`, which Postgres does not
+create for you:
 
 ```bash
-docker exec -it postgres_db createdb -U postgres remindme
+docker exec -it postgres_db createdb -U postgres db
 ```
 
 **2. Apply the schema.** Nothing runs `alembic upgrade head` on container start, so run it
@@ -149,11 +151,6 @@ yourself:
 ```bash
 docker compose exec api alembic upgrade head
 ```
-
-> ⚠️ Alembic currently points at a database named `db`
-> ([alembic/env.py:13](alembic/env.py#L13)) while the app points at `remindme`. Until that is
-> reconciled, make the two agree — either change the name in `env.py` to `remindme`, or create
-> `db` instead and change `database.py`. Tracked in [BACKLOG.md](BACKLOG.md).
 
 **3. Create the MinIO bucket** `my-bucket` via the console at http://localhost:9001.
 `create_bucket` exists in [minio_client.py](app/storage/minio_client.py) but is never called, so
@@ -221,10 +218,6 @@ The REST API is fully documented via **OpenAPI / Swagger UI** at `/docs`. All ro
 Posting a message returns immediately with the stored user message; the assistant's reply is
 produced by a Celery worker and appears in `GET /messages` once the job finishes.
 
-Note that identifiers are named inconsistently on the wire today — the chats and messages routes
-use camelCase (`chatId`, `documentId`, `messageId`) while the tasks and users routes use
-snake_case (`document_id`, `chat_id`, `task_id`, `user_id`). Converging on snake_case is tracked
-in the backlog.
 
 ---
 
@@ -232,7 +225,7 @@ in the backlog.
 
 Docky is under active development and is not production-ready. Known gaps — failed indexing and
 LLM jobs are not surfaced to the user, deletions do not cascade to MinIO or Qdrant, and there is
-no test suite yet — are tracked with priorities in [BACKLOG.md](BACKLOG.md).
+no test suite yet.
 
 ---
 
