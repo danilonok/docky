@@ -19,6 +19,16 @@ jobs:
       RABBIT_MQ_HOST: ${{ secrets.RABBIT_MQ_HOST }}
       MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
       MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+      LLM_PROVIDER: ${{ vars.LLM_PROVIDER }}
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
+      LLM_API_BASE: ${{ vars.LLM_API_BASE }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      LLM_CONTEXT_WINDOW: ${{ vars.LLM_CONTEXT_WINDOW }}
+      LLM_MAX_TOKENS: ${{ vars.LLM_MAX_TOKENS }}
+      EMBEDDING_PROVIDER: ${{ vars.EMBEDDING_PROVIDER }}
+      EMBEDDING_MODEL: ${{ vars.EMBEDDING_MODEL }}
+      EMBEDDING_API_BASE: ${{ vars.EMBEDDING_API_BASE }}
+      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
     steps:
       - uses: actions/checkout@v6
       - name: build-images

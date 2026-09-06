@@ -736,11 +736,14 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "llama-index" },
     { name = "llama-index-embeddings-ollama" },
+    { name = "llama-index-embeddings-openai" },
     { name = "llama-index-llms-ollama" },
+    { name = "llama-index-llms-openai-like" },
     { name = "llama-index-vector-stores-qdrant" },
     { name = "openinference-instrumentation-llama-index" },
     { name = "psycopg2-binary" },
     { name = "pwdlib", extra = ["argon2"] },
+    { name = "pydantic-settings" },
     { name = "pyjwt" },
     { name = "slowapi" },
     { name = "sqlmodel" },
@@ -756,11 +759,14 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.128.0" },
     { name = "llama-index", specifier = ">=0.14.12" },
     { name = "llama-index-embeddings-ollama", specifier = ">=0.8.6" },
+    { name = "llama-index-embeddings-openai", specifier = ">=0.5.1" },
     { name = "llama-index-llms-ollama", specifier = ">=0.9.1" },
+    { name = "llama-index-llms-openai-like", specifier = ">=0.7.0" },
     { name = "llama-index-vector-stores-qdrant", specifier = ">=0.9.1" },
     { name = "openinference-instrumentation-llama-index", specifier = ">=2.0.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.11" },
     { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3.0" },
+    { name = "pydantic-settings", specifier = ">=2.12.0" },
     { name = "pyjwt", extras = ["argon2"], specifier = ">=2.10.1" },
     { name = "slowapi", specifier = ">=0.1.10" },
     { name = "sqlmodel", specifier = ">=0.0.31" },
@@ -1575,6 +1581,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fa/71/fcede4077837a94ee35452507a21364643ddcb6db7dfbafb54ff235b381b/llama_index_llms_openai-0.6.12.tar.gz", hash = "sha256:9b8b1d7435983f974f7b45f79428361bfdb68c622541205392bf8f0fea179bae", size = 25681, upload-time = "2025-12-16T02:54:25.779Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/8b/67a373e5cbf44c1ccf4f46ac25be3bba249bf4b51f050a92c4e07cb7eb08/llama_index_llms_openai-0.6.12-py3-none-any.whl", hash = "sha256:1e9477a03fa87c73904ffb5b851ce9e776c24cb5ef9145394e27f2f926f14578", size = 26695, upload-time = "2025-12-16T02:54:24.648Z" },
+]
+
+[[package]]
+name = "llama-index-llms-openai-like"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llama-index-core" },
+    { name = "llama-index-llms-openai" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0d/db/f94c3a760ebab94ae9240c42ff1b4c55f48c87482dbcb7880ded011ce919/llama_index_llms_openai_like-0.7.0.tar.gz", hash = "sha256:f5bca46ca293f911d188bcc22c517db6f18943b69e1dcdbda4d2376db3488e4d", size = 5180, upload-time = "2026-03-12T20:27:36.445Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0a/2e/412d6f96eaca890049354b1990068897f575f5784dbf75570513e27f1de3/llama_index_llms_openai_like-0.7.0-py3-none-any.whl", hash = "sha256:4df771e4c2e415dd7f72088d4c14fef96c4a217a116302ad1879a9f90a564aa8", size = 4860, upload-time = "2026-03-12T20:27:35.477Z" },
 ]
 
 [[package]]
