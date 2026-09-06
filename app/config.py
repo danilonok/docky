@@ -23,6 +23,17 @@ class Provider(StrEnum):
     OPENAI_COMPATIBLE = "openai_compatible"
 
 
+class DocumentParser(StrEnum):
+    """How an uploaded document is turned into chunks."""
+
+    #: The self-hosted docling-serve container. Layout-aware, reads scans and
+    #: office formats. Costs ~17 GB of image and ~2.7 GiB of resident memory.
+    DOCLING = "docling"
+    #: In-process text extraction plus a token splitter. No service, no models,
+    #: but PDFs with a text layer only.
+    PYPDFIUM = "pypdfium"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
@@ -46,6 +57,14 @@ class Settings(BaseSettings):
     embedding_api_base: str | None = None
     embedding_api_key: SecretStr | None = None
     embedding_timeout: float = 120.0
+
+    # --- Document parsing -------------------------------------------------
+    document_parser: DocumentParser = DocumentParser.DOCLING
+    docling_do_ocr: bool = True
+    docling_timeout: float = 300.0
+    #: Only used by the pypdfium parser; docling does its own chunking.
+    chunk_size: int = 1024
+    chunk_overlap: int = 200
 
     # --- Service hosts ----------------------------------------------------
     ollama_host: str = "localhost"

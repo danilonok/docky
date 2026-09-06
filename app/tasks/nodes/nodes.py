@@ -1,6 +1,3 @@
-from io import BytesIO
-
-import requests
 from llama_index.core import SummaryIndex
 from llama_index.core.chat_engine import ContextChatEngine
 from llama_index.core.llms import ChatMessage, MessageRole
@@ -10,48 +7,13 @@ from llama_index.core.vector_stores.types import (
     MetadataFilters,
 )
 
-from app.config import get_settings
 from app.dependencies.database import session_scope
 from app.providers.llama_index import get_index, get_llm
+from app.providers.parsers import get_parser
 from app.services.messages import finish_message
 from app.storage.minio_client import download_from_minio
 
 BUCKET_NAME = 'my-bucket'
-
-
-def get_chunks(filename, filestream: BytesIO):
-    url = get_settings().docling_chunk_url
-    filestream.seek(0)
-
-    files = [
-        ('files', (filename, filestream, 'application/pdf'))
-    ]
-
-    data = {
-        "include_converted_doc": "true",
-        "convert_do_ocr": "true",
-        "target_type": "inbody",
-        "chunking_merge_peers": "true"
-    }
-
-    try:
-        response = requests.post(url, files=files, data=data)
-
-        if response.status_code == 200:
-            result = response.json()
-            doc = result['documents'][0]
-
-
-            if doc['status'] == 'success':
-                print(f"Successfully processed! Found {len(result['chunks'])} chunks.")
-                return result['chunks']
-            else:
-                print(f"Server rejected the file. Errors: {doc.get('errors')}")
-        else:
-            print(f"HTTP {response.status_code}: {response.text}")
-
-    except Exception as e:
-        print(f"Connection Error: {e}")
 
 
 def add_summary(nodes: list[dict], chat_id: int):
@@ -73,15 +35,15 @@ def add_document_to_index(document_path: str, chat_id: int):
     file = download_from_minio(filename=str(document_path), bucket_name=BUCKET_NAME)
     if not file:
         return False
-    # Break it to chunks with docling
+    # Break it to chunks with the configured parser
 
-    chunks = get_chunks(str(document_path), file)
+    chunks = get_parser().parse(str(document_path), file)
     if not chunks:
         return False
 
     nodes = []
     for chunk in chunks:
-        node = TextNode(text=chunk['text'], metadata={'chat_id': chat_id})
+        node = TextNode(text=chunk, metadata={'chat_id': chat_id})
         nodes.append(node)
 
     index = get_index()

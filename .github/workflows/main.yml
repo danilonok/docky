@@ -29,6 +29,11 @@ jobs:
       EMBEDDING_MODEL: ${{ vars.EMBEDDING_MODEL }}
       EMBEDDING_API_BASE: ${{ vars.EMBEDDING_API_BASE }}
       EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
+      DOCUMENT_PARSER: ${{ vars.DOCUMENT_PARSER }}
+      DOCLING_DO_OCR: ${{ vars.DOCLING_DO_OCR }}
+      DOCLING_TIMEOUT: ${{ vars.DOCLING_TIMEOUT }}
+      CHUNK_SIZE: ${{ vars.CHUNK_SIZE }}
+      CHUNK_OVERLAP: ${{ vars.CHUNK_OVERLAP }}
     steps:
       - uses: actions/checkout@v6
       - name: build-images
