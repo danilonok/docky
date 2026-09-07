@@ -159,4 +159,8 @@ export async function deleteChatDocuments(chatId) {
     return request(`/chats/${chatId}/documents`, { method: 'DELETE' });
 }
 
+export async function getTaskStatus(taskId) {
+    return request(`/tasks/${taskId}`, { method: 'GET' });
+}
+
 export { ApiError };

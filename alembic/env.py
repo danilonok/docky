@@ -26,6 +26,18 @@ from app.models import Base
 
 target_metadata = Base.metadata
 
+# Celery's result backend creates and owns celery_taskmeta / celery_tasksetmeta.
+# They are not in our metadata, so without this autogenerate would emit a
+# drop_table for each one on the next revision.
+CELERY_TABLES = {"celery_taskmeta", "celery_tasksetmeta"}
+
+
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table" and name in CELERY_TABLES:
+        return False
+    return True
+
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -49,6 +61,7 @@ def run_migrations_offline() -> None:
     context.configure(
         url=url,
         target_metadata=target_metadata,
+        include_object=include_object,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
@@ -72,7 +85,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            include_object=include_object,
         )
 
         with context.begin_transaction():
