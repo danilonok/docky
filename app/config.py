@@ -72,6 +72,7 @@ class Settings(BaseSettings):
     docling_host: str = "localhost"
 
     qdrant_collection: str = "documents"
+    s3_bucket: str = "my-bucket"
 
     @property
     def ollama_url(self) -> str:

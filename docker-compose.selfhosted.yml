@@ -1,0 +1,83 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama_service
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: always
+    # Remove this block to run Ollama on CPU.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  docling:
+    image: quay.io/docling-project/docling-serve
+    container_name: docling_service
+    ports:
+      - "127.0.0.1:5001:5001"
+    environment:
+      - DOCLING_SERVE_ENABLE_UI=1
+    restart: always
+
+  adminer:
+    image: adminer
+    container_name: adminer_service
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+  db:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  rabbitmq:
+    ports:
+      - "127.0.0.1:5672:5672"
+
+  minio:
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+
+  qdrant:
+    ports:
+      - "127.0.0.1:6333:6333"
+      - "127.0.0.1:6334:6334"
+
+  # All three share one image tag and one context, so only the first is a real build; the other two are cache hits.
+  init:
+    build: .
+
+  api:
+    build: .
+    ports:
+      - "8980:80"
+
+  frontend:
+    build:
+      context: ./frontend/app
+    ports:
+      - "3000:80"
+
+  celery_worker:
+    build: .
+    depends_on:
+      ollama:
+        condition: service_started
+      docling:
+        condition: service_started
+
+volumes:
+  ollama:
+    name: ollama

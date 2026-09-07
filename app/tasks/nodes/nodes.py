@@ -7,13 +7,12 @@ from llama_index.core.vector_stores.types import (
     MetadataFilters,
 )
 
+from app.config import get_settings
 from app.dependencies.database import session_scope
 from app.providers.llama_index import get_index, get_llm
 from app.providers.parsers import get_parser
 from app.services.messages import finish_message
 from app.storage.minio_client import download_from_minio
-
-BUCKET_NAME = 'my-bucket'
 
 
 def add_summary(nodes: list[dict], chat_id: int):
@@ -32,7 +31,7 @@ def add_summary(nodes: list[dict], chat_id: int):
 # When document is uploaded to chat, it should be added to the index
 def add_document_to_index(document_path: str, chat_id: int):
     # Get document file back from minio
-    file = download_from_minio(filename=str(document_path), bucket_name=BUCKET_NAME)
+    file = download_from_minio(filename=str(document_path), bucket_name=get_settings().s3_bucket)
     if not file:
         return False
     # Break it to chunks with the configured parser

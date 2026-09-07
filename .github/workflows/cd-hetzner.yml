@@ -1,0 +1,106 @@
+name: CD (hetzner)
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: cd-hetzner
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+  COMPOSE: -f docker-compose.yml -f docker-compose.hetzner.yml
+
+jobs:
+  deploy:
+    name: build and deploy
+    runs-on: ubuntu-latest
+    environment: hetzner
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend/app
+          push: true
+          tags: |
+            ${{ env.IMAGE }}-frontend:${{ github.sha }}
+            ${{ env.IMAGE }}-frontend:latest
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+      - name: Render .env
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+          AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
+        run: |
+          jq -r 'to_entries[] | "\(.key)=\(.value)"' <<< "$VARS_JSON" > .env
+          for name in AUTH_SECRET_KEY POSTGRES_PASSWORD AWS_ACCESS_KEY_ID \
+                      AWS_SECRET_ACCESS_KEY MINIO_ROOT_USER MINIO_ROOT_PASSWORD \
+                      LLM_API_KEY EMBEDDING_API_KEY; do
+            printf '%s=%s\n' "$name" "${!name}"
+          done >> .env
+          # Pin the deploy to this exact commit's images, so a rollback is just
+          # re-running an older workflow rather than chasing `latest`.
+          printf 'DOCKY_IMAGE=%s\nDOCKY_FRONTEND_IMAGE=%s-frontend\nDOCKY_TAG=%s\n' \
+            "$IMAGE" "$IMAGE" "$GITHUB_SHA" >> .env
+          echo "rendered $(wc -l < .env) entries"
+
+      - name: Copy compose files and .env
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          source: docker-compose.yml,docker-compose.hetzner.yml,.env
+          target: ~/docky
+
+      - name: Pull and restart
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/docky
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose ${{ env.COMPOSE }} pull
+            docker compose ${{ env.COMPOSE }} up -d --remove-orphans
+            docker compose ${{ env.COMPOSE }} ps
+            docker image prune -af --filter "until=168h"
