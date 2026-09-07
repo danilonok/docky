@@ -38,6 +38,10 @@ app.conf.update(
     # the queue dies with the connection that owns it. Note kombu rejects
     # exclusive and durable together, so control_queue_durable stays False.
     control_queue_exclusive=True,
+    # Same story for gossip, which subscribes to the worker event stream at
+    # startup and builds its queue from these settings. Also non-durable and
+    # non-exclusive by default, so it failed the moment mingle stopped failing.
+    event_queue_exclusive=True,
 )
 
 if __name__ == '__main__':

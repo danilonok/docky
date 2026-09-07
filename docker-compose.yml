@@ -50,7 +50,7 @@ services:
     restart: always
 
   rabbitmq:
-    image: rabbitmq
+    image: rabbitmq:4.3.5
     container_name: rabbitmq_service
     volumes:
       - rabbitmq:/var/lib/rabbitmq
