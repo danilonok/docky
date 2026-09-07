@@ -15,26 +15,26 @@ from sqlalchemy import select
 
 from app.schemas.user import UserRead
 from app.tasks.tasks import upload_document
-
-BUCKET_NAME = 'my-bucket'
+from app.config import get_settings
 
 
 def add_document(file: UploadFile, current_user: UserRead, session: SessionDep) -> Document | None:
     '''Upload a file to the object storage and save its metadata'''
+    bucket_name = get_settings().s3_bucket
     original_file_name = file.filename or ''
     extension = os.path.splitext(original_file_name)[1]
     file_id = str(uuid.uuid4())
     file_name = f'user-{current_user.id}/documents/{file_id}{extension}'
 
     try:
-        uploaded = upload_to_minio(file.file, file_name, BUCKET_NAME)
+        uploaded = upload_to_minio(file.file, file_name, bucket_name)
     finally:
         file.file.close()
 
     if not uploaded:
         return None
 
-    document = Document(bucket_name=BUCKET_NAME, file_name=file_name, extension=extension, original_file_name=original_file_name, user_id=current_user.id)
+    document = Document(bucket_name=bucket_name, file_name=file_name, extension=extension, original_file_name=original_file_name, user_id=current_user.id)
     session.add(document)
     session.commit()
     session.refresh(document)

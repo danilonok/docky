@@ -1,0 +1,25 @@
+# Serves the built SPA and proxies the API, so the browser only ever talks to
+# one origin. That mirrors the vite dev proxy in vite.config.js, and it means
+# CORS is never exercised in either setup.
+
+# Defaults to plain HTTP on :80 for local use. Set SITE_ADDRESS to a domain and
+# Caddy obtains and renews a certificate for it by itself — that is the whole
+# difference between the local and the public deployment.
+{$SITE_ADDRESS::80} {
+	encode gzip
+
+	# The client calls /api/... ; `handle_path` strips that prefix before
+	# forwarding, exactly like the dev proxy's rewrite. The API therefore sees
+	# the same paths whether you are running `npm run dev` or this container.
+	handle_path /api/* {
+		reverse_proxy api:80
+	}
+
+	handle {
+		root * /srv
+		# react-router owns client-side routes, so a deep link like /chats/5 is
+		# not a file on disk and has to fall back to the app shell.
+		try_files {path} /index.html
+		file_server
+	}
+}

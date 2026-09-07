@@ -1,0 +1,65 @@
+name: CD (self-hosted)
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/cd-hetzner.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: cd-selfhosted
+  cancel-in-progress: false
+
+env:
+  COMPOSE: -f docker-compose.yml -f docker-compose.selfhosted.yml
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: self-hosted
+    environment: selfhosted
+    env:
+      AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
+      POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
+      POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      AWS_HOST: ${{ vars.AWS_HOST }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+      MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+      QDRANT_HOST: ${{ vars.QDRANT_HOST }}
+      RABBIT_MQ_HOST: ${{ vars.RABBIT_MQ_HOST }}
+      DOCLING_HOST: ${{ vars.DOCLING_HOST }}
+      OLLAMA_HOST: ${{ vars.OLLAMA_HOST }}
+      LLM_PROVIDER: ${{ vars.LLM_PROVIDER }}
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
+      LLM_API_BASE: ${{ vars.LLM_API_BASE }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      LLM_CONTEXT_WINDOW: ${{ vars.LLM_CONTEXT_WINDOW }}
+      LLM_MAX_TOKENS: ${{ vars.LLM_MAX_TOKENS }}
+      EMBEDDING_PROVIDER: ${{ vars.EMBEDDING_PROVIDER }}
+      EMBEDDING_MODEL: ${{ vars.EMBEDDING_MODEL }}
+      EMBEDDING_API_BASE: ${{ vars.EMBEDDING_API_BASE }}
+      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
+      DOCUMENT_PARSER: ${{ vars.DOCUMENT_PARSER }}
+      DOCLING_DO_OCR: ${{ vars.DOCLING_DO_OCR }}
+      DOCLING_TIMEOUT: ${{ vars.DOCLING_TIMEOUT }}
+      CHUNK_SIZE: ${{ vars.CHUNK_SIZE }}
+      CHUNK_OVERLAP: ${{ vars.CHUNK_OVERLAP }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build images
+        run: docker compose ${{ env.COMPOSE }} build
+
+      - name: Start stack
+        run: docker compose ${{ env.COMPOSE }} up -d --remove-orphans
+
+      - name: Report status
+        if: always()
+        run: docker compose ${{ env.COMPOSE }} ps
