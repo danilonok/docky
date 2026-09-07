@@ -15,6 +15,14 @@ from app.services.messages import finish_message
 from app.storage.minio_client import download_from_minio
 
 
+class IndexingError(RuntimeError):
+    """Indexing could not finish, with a reason worth showing the user.
+
+    Raised rather than returned: a Celery task that returns False is
+    recorded as SUCCESS, so the failure would never reach anyone.
+    """
+
+
 def add_summary(nodes: list[dict], chat_id: int):
     index = get_index()
     doc_nodes = [TextNode.from_dict(d) for d in nodes]
@@ -29,16 +37,19 @@ def add_summary(nodes: list[dict], chat_id: int):
 
 
 # When document is uploaded to chat, it should be added to the index
-def add_document_to_index(document_path: str, chat_id: int):
+def add_document_to_index(document_path: str, chat_id: int) -> dict:
     # Get document file back from minio
     file = download_from_minio(filename=str(document_path), bucket_name=get_settings().s3_bucket)
     if not file:
-        return False
+        raise IndexingError(f"{document_path} is not in object storage")
     # Break it to chunks with the configured parser
 
     chunks = get_parser().parse(str(document_path), file)
     if not chunks:
-        return False
+        raise IndexingError(
+            f"No text could be extracted from {document_path}. A scanned PDF "
+            f"needs OCR, which the {get_settings().document_parser} parser does not do."
+        )
 
     nodes = []
     for chunk in chunks:
@@ -53,7 +64,7 @@ def add_document_to_index(document_path: str, chat_id: int):
     from app.tasks.tasks import add_summary_task
 
     add_summary_task.delay(nodes_as_dicts, chat_id)
-    return True
+    return {"document_path": document_path, "chat_id": chat_id, "chunks": len(nodes)}
 
 # Deletes all nodes with metadata key chat_id
 def clear_documents_in_chat(chat_id: int):

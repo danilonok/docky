@@ -10,6 +10,7 @@ from app.dependencies.database import SessionDep
 from app.models.chat import Chat
 from app.models.document import Document
 from app.schemas.chat import ChatRead
+from app.schemas.task import IndexingTask
 from app.schemas.document import DocumentRead
 from app.schemas.user import UserRead
 from app.services import chats as chat_service
@@ -33,10 +34,11 @@ async def add_chat(current_user: Annotated[UserRead, Depends(get_current_active_
     chat = chat_service.add_chat(current_user=current_user, session=session, title=title, user_ids=users)
     return chat
 
-@router.post("/chats/{chatId}/documents", tags=["chats"], response_model=ChatRead)
+@router.post("/chats/{chatId}/documents", tags=["chats"], response_model=IndexingTask)
 @limiter.limit("10/minute")
-async def add_document_to_chat(request: Request, chat: ChatDep, document: OwnedDocumentDep, session: SessionDep) -> Chat:
-    return chat_service.add_document_to_chat(session=session, chat=chat, document=document)
+async def add_document_to_chat(request: Request, chat: ChatDep, document: OwnedDocumentDep, session: SessionDep) -> IndexingTask:
+    task_id = chat_service.add_document_to_chat(session=session, chat=chat, document=document)
+    return IndexingTask(chat_id=chat.id, document_id=document.id, task_id=task_id)
 
 
 @router.get("/chats/{chatId}/documents", tags=["chats"], response_model=list[DocumentRead])
