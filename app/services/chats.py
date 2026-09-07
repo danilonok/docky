@@ -56,15 +56,20 @@ def delete_chat_by_id(session: SessionDep, chat_id: int) -> Chat | None:
     return chat
 
 
-def add_document_to_chat(session: SessionDep, document: Document, chat: Chat) -> Chat:
-    '''Attach an already-authorized document to an already-authorized chat'''
-    if document not in chat.documents:
-        chat.documents.append(document)
-        session.commit()
-        # Add document to index
-        upload_document.delay(chat_id=chat.id, document_path=document.file_name)
+def add_document_to_chat(session: SessionDep, document: Document, chat: Chat) -> str | None:
+    '''Attach an already-authorized document to an already-authorized chat.
 
-    return chat
+    Returns the id of the indexing task so the caller can follow it, or None
+    when the document was already attached and nothing was dispatched.
+    '''
+    if document in chat.documents:
+        return None
+
+    chat.documents.append(document)
+    session.commit()
+    # Add document to index
+    task = upload_document.delay(chat_id=chat.id, document_path=document.file_name)
+    return task.id
 
 def clear_documents_in_chat(session: SessionDep, chat: Chat) -> None:
     chat.documents.clear()

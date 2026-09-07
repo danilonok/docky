@@ -14,10 +14,20 @@ s3 = boto3.client(
     region_name="us-east-1"
 )
 def create_bucket(bucket_name):
+    """Create the bucket unless it already exists. Idempotent.
+
+    Only a missing bucket is created. Any other error — bad credentials, an
+    unreachable endpoint, a bucket owned by someone else — is re-raised rather
+    than misread as "not there yet", so startup fails with the real cause.
+    """
     try:
         s3.head_bucket(Bucket=bucket_name)
-    except ClientError:
-        s3.create_bucket(Bucket=bucket_name)
+        return
+    except ClientError as error:
+        code = error.response.get("Error", {}).get("Code", "")
+        if code not in ("404", "NoSuchBucket", "NotFound"):
+            raise
+    s3.create_bucket(Bucket=bucket_name)
 def upload_to_minio(file_content, file_name, bucket_name):
     try:
         s3.upload_fileobj(file_content, bucket_name, file_name)

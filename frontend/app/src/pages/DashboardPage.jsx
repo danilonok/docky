@@ -16,6 +16,7 @@ import {
     addDocumentToChat,
     deleteChatDocuments,
     getChat,
+    getTaskStatus,
 } from '../services/api';
 
 /* ───────────────────── Icons ───────────────────── */
@@ -56,6 +57,38 @@ const SourceIcon = () => (
 );
 
 /* ───────── Source-nodes hover popup ───────── */
+/* Indexing is asynchronous: attaching a document only queues the work, and a
+   document that is listed is not yet a document that can be asked about. */
+const IndexingBadge = ({ status }) => {
+    if (!status) return null;
+
+    const { state, result, error } = status;
+
+    if (state === 'SUCCESS') {
+        const chunks = result?.chunks;
+        return (
+            <span className="text-[11px] text-primary-400/80">
+                indexed{typeof chunks === 'number' ? ` · ${chunks} chunks` : ''}
+            </span>
+        );
+    }
+
+    if (state === 'FAILURE') {
+        return <span className="text-[11px] text-danger-400" title={error || ''}>failed · {error || 'indexing error'}</span>;
+    }
+
+    if (state === 'TIMEOUT') {
+        return <span className="text-[11px] text-surface-500">still indexing — reopen the chat to check</span>;
+    }
+
+    return (
+        <span className="text-[11px] text-surface-400 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+            {state === 'STARTED' ? 'indexing…' : 'queued…'}
+        </span>
+    );
+};
+
 function SourceNodesPopup({ sourceNodes }) {
     if (!sourceNodes || sourceNodes.length === 0) return null;
 
@@ -124,6 +157,9 @@ export default function DashboardPage() {
     const [messages, setMessages] = useState([]);
     const [documents, setDocuments] = useState([]);
     const [chatDocuments, setChatDocuments] = useState([]);
+    // documentId -> { state, result, error } for the running index job
+    const [indexing, setIndexing] = useState({});
+    const pollTimers = useRef({});
 
     // UI state
     const [messageInput, setMessageInput] = useState('');
@@ -182,7 +218,17 @@ export default function DashboardPage() {
         fetchDocuments();
     }, [fetchChats, fetchDocuments]);
 
+    const stopPolling = () => {
+        Object.values(pollTimers.current).forEach(clearTimeout);
+        pollTimers.current = {};
+    };
+
+    // Timers outlive the component unless they are cleared explicitly.
+    useEffect(() => stopPolling, []);
+
     useEffect(() => {
+        stopPolling();
+        setIndexing({});
         if (activeChatId) {
             fetchMessages(activeChatId);
             fetchChatInfo(activeChatId);
@@ -287,12 +333,41 @@ export default function DashboardPage() {
         }
     };
 
+    // 2s for up to ~5 minutes: indexing runs on one worker, and a large PDF on
+    // a small box is slow. Giving up only stops the polling, not the job.
+    const POLL_INTERVAL_MS = 2000;
+    const POLL_MAX_ATTEMPTS = 150;
+
+    const pollIndexing = (documentId, taskId, attempt = 0) => {
+        getTaskStatus(taskId)
+            .then((status) => {
+                setIndexing((prev) => ({ ...prev, [documentId]: status }));
+                if (status.state === 'SUCCESS' || status.state === 'FAILURE') return;
+                if (attempt >= POLL_MAX_ATTEMPTS) {
+                    setIndexing((prev) => ({ ...prev, [documentId]: { state: 'TIMEOUT' } }));
+                    return;
+                }
+                pollTimers.current[documentId] = setTimeout(
+                    () => pollIndexing(documentId, taskId, attempt + 1),
+                    POLL_INTERVAL_MS,
+                );
+            })
+            .catch(() => {
+                setIndexing((prev) => ({ ...prev, [documentId]: { state: 'TIMEOUT' } }));
+            });
+    };
+
     const handleAttachDocument = async (documentId) => {
         if (!activeChatId || !documentId) return;
         try {
-            await addDocumentToChat(documentId, activeChatId);
+            const started = await addDocumentToChat(documentId, activeChatId);
             const docsData = await getChatDocuments(activeChatId);
             setChatDocuments(docsData || []);
+            // task_id is null when the document was already attached.
+            if (started?.task_id) {
+                setIndexing((prev) => ({ ...prev, [documentId]: { state: 'PENDING' } }));
+                pollIndexing(documentId, started.task_id);
+            }
         } catch {
             // ignore
         }
@@ -532,6 +607,7 @@ export default function DashboardPage() {
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <p className="text-sm text-surface-200 truncate">{getFileName(name)}</p>
+                                                <IndexingBadge status={indexing[doc.id]} />
                                             </div>
                                         </div>
                                     );
