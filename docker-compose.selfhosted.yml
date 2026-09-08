@@ -67,6 +67,8 @@ services:
   frontend:
     build:
       context: ./frontend/app
+    environment:
+      DOCKY_EDITION: ${DOCKY_EDITION:-selfhosted}
     ports:
       - "3000:80"
 

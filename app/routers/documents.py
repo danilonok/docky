@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, status
 
 from app.dependencies.database import SessionDep
 from app.models.document import Document
@@ -11,8 +11,15 @@ from app.dependencies.auth import get_current_active_user
 router = APIRouter()
 
 
-@router.post("/documents/upload", tags=['documents'])
-def upload(current_user: Annotated[UserRead, Depends(get_current_active_user)], session: SessionDep, file: UploadFile = File(...), ):
+@router.post("/documents/upload", tags=['documents'], response_model=DocumentRead, status_code=status.HTTP_201_CREATED)
+def upload(current_user: Annotated[UserRead, Depends(get_current_active_user)], session: SessionDep, file: UploadFile = File(...), ) -> Document:
+    """Store a file and record it in the library.
+
+    Returns the document rather than a confirmation sentence: the caller's next
+    step is almost always to attach it to a chat, which needs its id. Finding
+    that id by re-listing the library and matching on filename would pick the
+    wrong row the moment a user uploads two files with the same name.
+    """
     if not file.filename:
         raise HTTPException(status_code=400, detail="File must have a filename")
 
@@ -20,7 +27,7 @@ def upload(current_user: Annotated[UserRead, Depends(get_current_active_user)], 
     if not document:
         raise HTTPException(status_code=500, detail='Something went wrong')
 
-    return {"message": f"Successfully uploaded {document.original_file_name}"}
+    return document
 
 @router.get("/documents", tags=['documents'], response_model=list[DocumentRead])
 def get_documents(current_user: Annotated[UserRead, Depends(get_current_active_user)],  session: SessionDep, offset: int = 0, limit: int = 100) -> list[Document] | None:
