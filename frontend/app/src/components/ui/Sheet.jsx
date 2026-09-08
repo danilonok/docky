@@ -7,7 +7,7 @@ import { cx } from './cx';
 // enough that a deliberate pull does.
 const DISMISS_DISTANCE = 110;
 
-// A fast flick counts even if it is short — px per millisecond.
+// A fast flick counts even if it is short – px per millisecond.
 const FLICK_VELOCITY = 0.5;
 const FLICK_MIN_DISTANCE = 24;
 
@@ -21,14 +21,14 @@ const SNAP = 'transform 200ms ease-out';
  * and pulled down to dismiss.
  *
  * The grabber is a real control, not decoration. Dragging starts from the
- * header — the grabber, the title, the subtitle — and never from the body,
+ * header – the grabber, the title, the subtitle – and never from the body,
  * because the body scrolls and a gesture cannot mean both things at once.
  *
  * It is also a button, so the sheet can be closed by keyboard and announced to
  * a screen reader: a gesture is not an affordance everyone has.
  *
  * The drag writes its transform straight to the element. Holding the offset in
- * state would re-render the sheet — and the list inside it — on every pointer
+ * state would re-render the sheet – and the list inside it – on every pointer
  * move, which is the one thing a gesture cannot afford.
  */
 export default function Sheet({ open, onClose, title, subtitle, footer, children, className }) {

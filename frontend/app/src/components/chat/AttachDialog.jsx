@@ -119,8 +119,8 @@ export default function AttachDialog({
                                         <Checkbox
                                             checked={checked}
                                             // An attached document cannot be
-                                            // detached one at a time — the API
-                                            // only clears them all — so the row
+                                            // detached one at a time – the API
+                                            // only clears them all – so the row
                                             // is shown as settled, not editable.
                                             disabled={attached}
                                             onChange={() => toggle(document.id)}
@@ -154,7 +154,7 @@ export default function AttachDialog({
 
     const detachAll = async () => {
         // The API clears a chat's documents all at once or not at all, so this
-        // is the whole of what detaching can offer — said plainly rather than
+        // is the whole of what detaching can offer – said plainly rather than
         // dressed up as a per-row control that would not work.
         const confirmed = window.confirm(
             'Detach every document from this chat? They stay in your library, and re-attaching re-indexes them.',
@@ -257,7 +257,7 @@ export default function AttachDialog({
         title: 'Add documents',
         subtitle:
             tab === 'upload'
-                ? 'You can close this — indexing continues in the background.'
+                ? 'You can close this – indexing continues in the background.'
                 : chatTitle
                   ? `to “${chatTitle}”`
                   : undefined,

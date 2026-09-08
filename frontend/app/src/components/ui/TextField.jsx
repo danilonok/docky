@@ -14,7 +14,7 @@ export default function TextField({
     helper,
     tone = 'muted',
     trailing,
-    // Sits between the input and the helper line — the strength meter on the
+    // Sits between the input and the helper line – the strength meter on the
     // register form is the reason this slot exists.
     below,
     id,

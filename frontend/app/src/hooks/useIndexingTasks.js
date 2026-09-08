@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTaskStatus } from '../services/api';
 
 // Indexing runs on one worker and a large PDF on a small box is slow. Giving up
-// only stops the polling, not the job — the document keeps indexing, and
+// only stops the polling, not the job – the document keeps indexing, and
 // reopening the chat is how the user finds out it finished.
 const POLL_INTERVAL_MS = 2000;
 const POLL_MAX_ATTEMPTS = 150;
@@ -12,7 +12,7 @@ const POLL_MAX_ATTEMPTS = 150;
  *
  * Celery reports a state and nothing finer: PENDING, STARTED, then SUCCESS with
  * a chunk count or FAILURE with a reason. There is no percentage to be had, so
- * nothing here invents one — the UI shows the state and an indeterminate bar.
+ * nothing here invents one – the UI shows the state and an indeterminate bar.
  *
  * Keyed by document id, because that is what the chat header and the library
  * list both have in hand when they need to know whether a document is ready.
@@ -92,7 +92,7 @@ export function describeIndexing(status) {
         case 'FAILURE':
             return { tone: 'danger', label: status.error ?? 'indexing failed', done: true };
         case 'TIMEOUT':
-            return { tone: 'muted', label: 'still indexing — reopen to check', done: false };
+            return { tone: 'muted', label: 'still indexing – reopen to check', done: false };
         case 'STARTED':
             return { tone: 'accent', label: 'indexing…', done: false };
         default:

@@ -5,7 +5,7 @@ import { useDialog } from '../../hooks/useDialog';
  *
  * It is a dialog, so it behaves like one: Escape closes it, the page behind it
  * stops scrolling, focus moves in and comes back out, and Tab stays inside. The
- * same hook the modal and the sheet use — a panel covering the screen owes the
+ * same hook the modal and the sheet use – a panel covering the screen owes the
  * user the same things whichever side it slides from.
  */
 export default function SidebarDrawer({ open, onClose, children }) {

@@ -5,7 +5,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 const MAX_ROWS = 5;
 
 // Below this the field is too narrow for the long prompt, which then wraps to
-// two lines while the box is still sized for one — the placeholder is what gets
+// two lines while the box is still sized for one – the placeholder is what gets
 // clipped, since auto-sizing measures the value and an empty value is one line.
 const ROOMY_FIELD = '(min-width: 640px)';
 

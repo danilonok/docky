@@ -278,7 +278,7 @@ export default function ChatPage() {
                             disabled={sending || awaitingReply}
                             warning={
                                 chatDocuments.length === 0
-                                    ? 'No documents attached yet — answers will have nothing to draw on.'
+                                    ? 'No documents attached yet – answers will have nothing to draw on.'
                                     : null
                             }
                             hint={`Answers come from the ${chatDocuments.length} attached document${chatDocuments.length === 1 ? '' : 's'} only.`}

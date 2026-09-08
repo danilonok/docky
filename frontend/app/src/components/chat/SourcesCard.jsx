@@ -6,8 +6,8 @@ const INITIAL_VISIBLE = 2;
 /**
  * The passages an answer was built from.
  *
- * Each node carries its text and a relevance score, and — since documents are
- * indexed with their provenance — the document it came from and the page it was
+ * Each node carries its text and a relevance score, and – since documents are
+ * indexed with their provenance – the document it came from and the page it was
  * on. Anything the retriever could not attribute is simply left out of the meta
  * line rather than filled with a placeholder. Passages indexed before that
  * provenance existed therefore show a score and nothing else.

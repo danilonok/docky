@@ -50,7 +50,7 @@ function describe(upload, status) {
             return {
                 step: 1,
                 tone: 'failed',
-                // The server writes this one for the user — a scanned PDF gets
+                // The server writes this one for the user – a scanned PDF gets
                 // told it needs OCR, in those words.
                 detail: status.error ?? 'Indexing failed.',
             };
@@ -58,7 +58,7 @@ function describe(upload, status) {
             return {
                 step: 1,
                 tone: 'busy',
-                detail: 'Still indexing. It continues in the background — reopen the chat to check.',
+                detail: 'Still indexing. It continues in the background – reopen the chat to check.',
             };
         case 'STARTED':
             return { step: 1, tone: 'busy', detail: 'Indexing…' };

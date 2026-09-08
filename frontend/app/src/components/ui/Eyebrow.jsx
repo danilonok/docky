@@ -1,6 +1,6 @@
 import { cx } from './cx';
 
-/** The small uppercase label above a section — SOURCES, or "You asked · 14:02". */
+/** The small uppercase label above a section – SOURCES, or "You asked · 14:02". */
 export default function Eyebrow({ tone = 'faint', className, children, ...props }) {
     return (
         <span

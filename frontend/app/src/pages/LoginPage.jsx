@@ -17,7 +17,7 @@ export default function LoginPage() {
     const text = copy();
 
     // Set by the register page on success. Registration does not sign the user
-    // in — the API issues no token — so saying so here is what closes the loop.
+    // in – the API issues no token – so saying so here is what closes the loop.
     const justRegistered = location.state?.registered === true;
 
     const handleSubmit = async (event) => {

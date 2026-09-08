@@ -15,7 +15,7 @@ class ApiError extends Error {
  *
  * The API speaks in three shapes and only one of them is a plain string:
  * `{detail: "..."}` from an HTTPException, `{detail: [...]}` from request
- * validation — which is how the server's own password rules come back — and
+ * validation – which is how the server's own password rules come back – and
  * `{error: "..."}` from the rate limiter. Reading only the first left the other
  * two rendering as "[object Object]" or a bare status code.
  */
@@ -48,7 +48,7 @@ function formatError(payload, status, retryAfter) {
 /**
  * Where the access token lives.
  *
- * localStorage when the user asked to stay signed in, sessionStorage otherwise —
+ * localStorage when the user asked to stay signed in, sessionStorage otherwise –
  * which is what makes "Keep me signed in" mean anything: without it the token
  * outlives the browser session whether or not the box was ticked. Reads check
  * both, so a session either way is found.
@@ -224,7 +224,7 @@ export async function getDocuments() {
  *
  * XMLHttpRequest rather than fetch, for the one thing fetch cannot do: report
  * request upload progress. This is also the only percentage in the whole flow
- * that is real — indexing afterwards reports a state and nothing finer — so it
+ * that is real – indexing afterwards reports a state and nothing finer – so it
  * is worth the older API to have it.
  *
  * Resolves with the created document, whose id the caller needs to attach it.
@@ -266,7 +266,7 @@ export function uploadDocument(file, { onProgress, signal } = {}) {
         });
 
         request_.addEventListener('error', () =>
-            reject(new ApiError('Upload failed — the connection dropped.', 0, null)),
+            reject(new ApiError('Upload failed – the connection dropped.', 0, null)),
         );
         request_.addEventListener('abort', () =>
             reject(new ApiError('Upload cancelled.', 0, null)),

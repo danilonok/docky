@@ -4,8 +4,8 @@ import { describeIndexing } from '../../hooks/useIndexingTasks';
 /**
  * Chat title, what the answers are drawn from, and the way to attach more.
  *
- * The mocks also put member avatars here. A chat does have members — the API
- * takes user ids when one is created — but nothing reads them back and there is
+ * The mocks also put member avatars here. A chat does have members – the API
+ * takes user ids when one is created – but nothing reads them back and there is
  * no endpoint to look a user up, so there is no one to draw.
  */
 export default function ChatHeader({
@@ -65,13 +65,13 @@ export default function ChatHeader({
                                 tone={pending || status?.tone === 'danger' ? 'accent' : 'default'}
                                 title={
                                     status
-                                        ? `${document.original_file_name} — ${status.label}`
+                                        ? `${document.original_file_name} – ${status.label}`
                                         : document.original_file_name
                                 }
                             >
                                 {/* Only the name is capped. The status is short,
                                     it is the half that changes, and it is the
-                                    half worth reading — so it never gets cut. */}
+                                    half worth reading – so it never gets cut. */}
                                 <span className="max-w-[190px] truncate">
                                     {document.original_file_name}
                                 </span>
@@ -106,7 +106,7 @@ export default function ChatHeader({
                 >
                     <span className="truncate">
                         {working.length === 1
-                            ? `${working[0].name} — ${working[0].label}`
+                            ? `${working[0].name} – ${working[0].label}`
                             : `${working.length} documents indexing`}
                     </span>
                     <span className="shrink-0 underline">Details</span>

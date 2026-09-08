@@ -69,7 +69,7 @@ export default function UploadTab({ uploads, indexing, onFiles, onRetry, onDismi
                 />
 
                 <p className="pb-4 text-center text-xs leading-[1.5] text-ink-faint">
-                    Indexing continues in the background — you can close this and keep working.
+                    Indexing continues in the background – you can close this and keep working.
                 </p>
             </div>
         </div>

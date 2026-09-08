@@ -9,7 +9,7 @@ let nextId = 0;
  *
  * A file goes through two server round trips: it is stored in the library, then
  * attached to this chat, which is what starts indexing. Only the first has a
- * measurable percentage — the second is a Celery task that reports a state — so
+ * measurable percentage – the second is a Celery task that reports a state – so
  * a card shows a real bar while uploading and an indeterminate one afterwards.
  *
  * Indexing itself is followed by `useIndexingTasks`, whose `track` is passed in.

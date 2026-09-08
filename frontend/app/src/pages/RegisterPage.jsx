@@ -106,8 +106,8 @@ export default function RegisterPage() {
                     helper={
                         password
                             ? strength.satisfied
-                                ? `${strength.label} — meets every requirement`
-                                : `${strength.label} — needs ${strength.missing.join(', ')}`
+                                ? `${strength.label} – meets every requirement`
+                                : `${strength.label} – needs ${strength.missing.join(', ')}`
                             : 'At least 8 characters, with an uppercase letter, a digit and a special character.'
                     }
                     tone={password && strength.satisfied ? 'success' : 'muted'}

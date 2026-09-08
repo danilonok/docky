@@ -21,7 +21,7 @@
   --color-paper-sunk: #eae5d9;
   --color-paper-tint: #f1ece1;
   /* Documented in the design tokens as the modal backdrop. The backdrops
-     use `.dialog-backdrop` instead — see the note there — so this is kept
+     use `.dialog-backdrop` instead – see the note there – so this is kept
      for the palette rather than because anything paints with it. */
   --color-scrim: #ded8ca;
 
@@ -52,7 +52,7 @@
 
   /* Where the chat's desktop layout starts: a 244px sidebar beside a 720px
      reading column. Kept in step with DESKTOP_QUERY in hooks/useMediaQuery.js,
-     which decides the same thing in JavaScript — the sidebar and the header's
+     which decides the same thing in JavaScript – the sidebar and the header's
      document chips have to appear at the same width, not 124px apart. */
   --breakpoint-desk: 900px;
 
@@ -64,7 +64,7 @@
   --animate-slide-up: slide-up 0.5s ease-out;
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
-  /* For work that reports a state but not a fraction — see ProgressBar. */
+  /* For work that reports a state but not a fraction – see ProgressBar. */
   --animate-indeterminate: indeterminate 1.4s ease-in-out infinite;
 }
 
@@ -148,7 +148,7 @@
 
 /* ── Dialog backdrop ───────────────────────────────────────────────────────
    The design tokens call for an opaque wash (`scrim`, #ded8ca), and the mocks
-   show one — but a static artboard has nothing behind it to draw, so filling
+   show one – but a static artboard has nothing behind it to draw, so filling
    the frame costs it nothing. In the running app that same fill hides the chat
    completely, and a sheet covering the lower half leaves a flat block of colour
    above it that reads as a rendering fault.

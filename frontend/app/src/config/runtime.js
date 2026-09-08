@@ -10,8 +10,8 @@
 /**
  * The edition a deployment falls back to when configuration cannot be read.
  *
- * Deliberately the neutral one. The self-hosted copy makes promises — nothing
- * leaves your machine, your files stay on this server — that are reassuring
+ * Deliberately the neutral one. The self-hosted copy makes promises – nothing
+ * leaves your machine, your files stay on this server – that are reassuring
  * when true and a lie when not. Showing neutral copy on a self-hosted instance
  * understates it; showing self-hosted copy on a hosted one misleads the user
  * about where their documents went. Only the first mistake is safe to make by
@@ -55,7 +55,7 @@ export async function loadConfig() {
 /**
  * The resolved configuration.
  *
- * Synchronous on purpose — `loadConfig` is awaited before the first render, so
+ * Synchronous on purpose – `loadConfig` is awaited before the first render, so
  * components read copy without a loading branch in every one of them.
  */
 export function getConfig() {

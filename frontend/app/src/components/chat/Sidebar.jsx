@@ -71,7 +71,7 @@ export default function Sidebar({
                                         </NavLink>
 
                                         {/* Revealed on hover, but always reachable
-                                            by keyboard — focus-within keeps it
+                                            by keyboard – focus-within keeps it
                                             visible once tabbed to. */}
                                         <button
                                             type="button"

@@ -5,7 +5,7 @@ import { cx } from './cx';
  * Named stages joined by rules: done, current, still to come.
  *
  * Generic over the number of steps because what the backend can actually report
- * is coarser than the five stages in the mocks — indexing is one opaque task, so
+ * is coarser than the five stages in the mocks – indexing is one opaque task, so
  * the upload card drives this with three.
  */
 export default function Stepper({ steps, current, className }) {

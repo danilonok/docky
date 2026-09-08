@@ -4,7 +4,7 @@ import { cx } from './cx';
  * The pill used for document attachments in the chat header.
  *
  * Deliberately does not truncate its own contents. `text-overflow` has no effect
- * on a flex container, so truncating here clipped mid-word with no ellipsis —
+ * on a flex container, so truncating here clipped mid-word with no ellipsis –
  * and clipped the wrong half, cutting the status the user is watching rather
  * than the filename they already know. Callers that need it wrap the part which
  * may run long in a truncating span, and let the rest size itself.

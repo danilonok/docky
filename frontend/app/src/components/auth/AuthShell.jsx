@@ -5,7 +5,7 @@ import { Logo } from '../ui';
  *
  * Wide enough, it is the split layout from the mocks: a fixed panel saying what
  * Docky is, and a form that never scrolls beside it. Narrower, the panel goes
- * away entirely rather than stacking above the form — its job is to fill space
+ * away entirely rather than stacking above the form – its job is to fill space
  * that only exists on a desktop, and repeating it on a phone would push the
  * fields below the fold.
  *

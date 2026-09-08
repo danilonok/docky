@@ -42,7 +42,7 @@ const COPY = {
         upload: {
             dropzoneHint: 'Up to 50 MB · parsed locally',
         },
-        tagline: 'Docky — smart document management',
+        tagline: 'Docky – smart document management',
     },
 
     cloud: {
@@ -75,7 +75,7 @@ const COPY = {
         upload: {
             dropzoneHint: 'Up to 50 MB · PDF',
         },
-        tagline: 'Docky — smart document management',
+        tagline: 'Docky – smart document management',
     },
 };
 
@@ -85,7 +85,7 @@ export function copy() {
 }
 
 /**
- * For the rare case where the difference is structural rather than wording —
+ * For the rare case where the difference is structural rather than wording –
  * a whole block that only one edition shows. Prefer `copy()` where a string
  * will do.
  */

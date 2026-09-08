@@ -3,7 +3,7 @@ import { cx } from './cx';
 /**
  * A checkbox drawn to the design rather than by the platform.
  *
- * The real input stays in the tree, only visually hidden — it keeps keyboard
+ * The real input stays in the tree, only visually hidden – it keeps keyboard
  * behaviour, the label association and the announced state, none of which a
  * styled span would have.
  */

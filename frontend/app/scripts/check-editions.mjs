@@ -31,7 +31,7 @@ try {
         failures += 1;
         console.log(`  EMPTY selfhosted/${name}: no self-hosted claim rendered at all`);
       } else {
-        console.log(`  ok    ${edition}/${name} — ${edition === 'cloud' ? 'no self-hosting claims' : found.length + ' claims present'}`);
+        console.log(`  ok    ${edition}/${name} – ${edition === 'cloud' ? 'no self-hosting claims' : found.length + ' claims present'}`);
       }
     }
   }

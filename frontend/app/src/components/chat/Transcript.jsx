@@ -30,7 +30,7 @@ function QuestionBlock({ message }) {
 
 function AnswerBlock({ message, onCopy, onRegenerate }) {
     // The worker creates the assistant row empty and fills it in when the model
-    // is done, so an unfinished message is not an error — it is the answer, not
+    // is done, so an unfinished message is not an error – it is the answer, not
     // written yet.
     if (!message.finished) {
         return (

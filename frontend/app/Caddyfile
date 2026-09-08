@@ -3,7 +3,7 @@
 # CORS is never exercised in either setup.
 
 # Defaults to plain HTTP on :80 for local use. Set SITE_ADDRESS to a domain and
-# Caddy obtains and renews a certificate for it by itself — that is the whole
+# Caddy obtains and renews a certificate for it by itself – that is the whole
 # difference between the local and the public deployment.
 {$SITE_ADDRESS::80} {
 	encode gzip
