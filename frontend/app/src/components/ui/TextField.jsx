@@ -10,6 +10,7 @@ import { cx } from './cx';
  */
 export default function TextField({
     label,
+    labelHidden,
     helper,
     tone = 'muted',
     trailing,
@@ -26,7 +27,13 @@ export default function TextField({
 
     return (
         <div className="flex flex-col gap-[7px]">
-            <label htmlFor={inputId} className="text-[13px] font-semibold text-ink-muted">
+            <label
+                htmlFor={inputId}
+                className={cx(
+                    'text-[13px] font-semibold text-ink-muted',
+                    labelHidden && 'sr-only',
+                )}
+            >
                 {label}
             </label>
 

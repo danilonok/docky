@@ -18,6 +18,7 @@ export default function Tabs({ items, value, onChange, className }) {
                         onClick={() => onChange(item.value)}
                         className={cx(
                             '-mb-px flex min-h-11 cursor-pointer items-center border-b-2 pb-[10px] text-sm transition-colors sm:min-h-0 sm:pt-0',
+                            'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/25',
                             selected
                                 ? 'font-semibold text-ink border-accent'
                                 : 'text-ink-faint border-transparent hover:text-ink-muted',

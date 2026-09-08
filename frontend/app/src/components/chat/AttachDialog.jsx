@@ -80,7 +80,8 @@ export default function AttachDialog({
         <>
             <div className="shrink-0 px-4 pb-3 pt-4 sm:px-6">
                 <TextField
-                    label="Search"
+                    label="Search documents"
+                    labelHidden
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder={`Search ${documents.length} document${documents.length === 1 ? '' : 's'}…`}
@@ -173,7 +174,7 @@ export default function AttachDialog({
 
     const libraryFooter = (
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-[13px] text-ink-faint">
+            <span className="pt-1 text-center text-[13px] text-ink-faint sm:pt-0 sm:text-left">
                 {attachedIds.size > 0 ? (
                     <button
                         type="button"

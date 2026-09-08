@@ -20,6 +20,9 @@
   --color-paper-raised: #fbf9f4;
   --color-paper-sunk: #eae5d9;
   --color-paper-tint: #f1ece1;
+  /* Documented in the design tokens as the modal backdrop. The backdrops
+     use `.dialog-backdrop` instead — see the note there — so this is kept
+     for the palette rather than because anything paints with it. */
   --color-scrim: #ded8ca;
 
   /* Text */
@@ -141,6 +144,21 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
+
+/* ── Dialog backdrop ───────────────────────────────────────────────────────
+   The design tokens call for an opaque wash (`scrim`, #ded8ca), and the mocks
+   show one — but a static artboard has nothing behind it to draw, so filling
+   the frame costs it nothing. In the running app that same fill hides the chat
+   completely, and a sheet covering the lower half leaves a flat block of colour
+   above it that reads as a rendering fault.
+
+   So: translucent, and ink rather than the beige. Beige at partial alpha over a
+   light chat leaves no contrast against a paper-coloured panel, and the panel
+   stops looking raised. Shared by the modal, the sheet and the sidebar drawer
+   so the three cannot drift apart. */
+.dialog-backdrop {
+  background-color: color-mix(in srgb, var(--color-ink) 32%, transparent);
 }
 
 /* ── Answer prose ──────────────────────────────────────────────────────────

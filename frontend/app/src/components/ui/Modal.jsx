@@ -6,8 +6,8 @@ import { cx } from './cx';
  * The desktop dialog: a scrim over the page and a panel that never grows past
  * the viewport, scrolling its own body instead.
  *
- * The backdrop is opaque rather than translucent, which is what `scrim` is for —
- * the design washes the content out instead of dimming it.
+ * The backdrop dims the page rather than covering it: see `.dialog-backdrop`
+ * in index.css for why that departs from the design tokens.
  */
 export default function Modal({ open, onClose, title, subtitle, footer, children, className }) {
     const dialogRef = useDialog(open, onClose);
@@ -17,7 +17,7 @@ export default function Modal({ open, onClose, title, subtitle, footer, children
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-scrim p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center dialog-backdrop p-4"
             // A click that starts and ends on the backdrop is a dismissal; one
             // that started inside and drifted out while selecting text is not.
             onMouseDown={(event) => {

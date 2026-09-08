@@ -15,7 +15,7 @@ export default function SidebarDrawer({ open, onClose, children }) {
 
     return (
         <div
-            className="fixed inset-0 z-40 flex bg-scrim/90"
+            className="fixed inset-0 z-40 flex dialog-backdrop"
             onMouseDown={(event) => {
                 if (event.target === event.currentTarget) onClose();
             }}

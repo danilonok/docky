@@ -51,7 +51,9 @@ export default function ChatHeader({
                     </div>
                 </div>
 
-                <div className="hidden shrink-0 items-center gap-2 desk:flex">
+                {/* The row gives way before the title does: it scrolls once the
+                    chips stop fitting, rather than pushing the chat name out. */}
+                <div className="hidden min-w-0 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden desk:flex">
                     {documents.map((document) => {
                         const status = describeIndexing(indexing[document.id]);
                         const pending = status && !status.done;
@@ -59,21 +61,32 @@ export default function ChatHeader({
                         return (
                             <Chip
                                 key={document.id}
+                                className="shrink-0"
                                 tone={pending || status?.tone === 'danger' ? 'accent' : 'default'}
-                                truncate
                                 title={
                                     status
                                         ? `${document.original_file_name} — ${status.label}`
                                         : document.original_file_name
                                 }
                             >
-                                {document.original_file_name}
-                                {pending ? ` · ${status.label}` : ''}
+                                {/* Only the name is capped. The status is short,
+                                    it is the half that changes, and it is the
+                                    half worth reading — so it never gets cut. */}
+                                <span className="max-w-[190px] truncate">
+                                    {document.original_file_name}
+                                </span>
+                                {pending && <span className="shrink-0"> · {status.label}</span>}
                             </Chip>
                         );
                     })}
 
-                    <Chip tone="action" as="button" type="button" onClick={onAddDocuments}>
+                    <Chip
+                        tone="action"
+                        as="button"
+                        type="button"
+                        onClick={onAddDocuments}
+                        className="shrink-0"
+                    >
                         + Add
                     </Chip>
                 </div>
