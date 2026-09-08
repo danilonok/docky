@@ -23,7 +23,7 @@ export default function Chip({
                 'inline-flex items-center rounded-full border px-[11px] py-1.5 text-xs whitespace-nowrap',
                 tone === 'default' && 'border-line bg-paper-raised text-ink-muted',
                 tone === 'accent' && 'border-line bg-paper-raised text-accent',
-                tone === 'action' && 'border-accent text-accent font-semibold cursor-pointer',
+                tone === 'action' && 'border-accent text-accent font-semibold cursor-pointer min-h-11 sm:min-h-0',
                 truncate && 'max-w-[190px] overflow-hidden text-ellipsis',
                 className,
             )}

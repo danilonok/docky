@@ -21,6 +21,7 @@ import ChatHeader from '../components/chat/ChatHeader';
 import Transcript from '../components/chat/Transcript';
 import Composer from '../components/chat/Composer';
 import AttachDialog from '../components/chat/AttachDialog';
+import SidebarDrawer from '../components/chat/SidebarDrawer';
 
 export default function ChatPage() {
     const { chatId } = useParams();
@@ -231,11 +232,9 @@ export default function ChatPage() {
             {desktop ? (
                 sidebar
             ) : (
-                menuOpen && (
-                    <div className="fixed inset-0 z-40 flex bg-scrim/80" onMouseDown={() => setMenuOpen(false)}>
-                        <div onMouseDown={(event) => event.stopPropagation()}>{sidebar}</div>
-                    </div>
-                )
+                <SidebarDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
+                    {sidebar}
+                </SidebarDrawer>
             )}
 
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -274,13 +273,15 @@ export default function ChatPage() {
                             value={draft}
                             onChange={setDraft}
                             onSubmit={handleSend}
+                            onAttach={() => setAttachOpen(true)}
                             sending={sending}
                             disabled={sending || awaitingReply}
-                            hint={
+                            warning={
                                 chatDocuments.length === 0
                                     ? 'No documents attached yet — answers will have nothing to draw on.'
-                                    : `Answers come from the ${chatDocuments.length} attached document${chatDocuments.length === 1 ? '' : 's'} only.`
+                                    : null
                             }
+                            hint={`Answers come from the ${chatDocuments.length} attached document${chatDocuments.length === 1 ? '' : 's'} only.`}
                         />
                     </>
                 ) : (

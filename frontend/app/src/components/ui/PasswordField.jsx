@@ -13,7 +13,7 @@ export default function PasswordField({ label = 'Password', ...props }) {
                 <button
                     type="button"
                     onClick={() => setVisible((current) => !current)}
-                    className="text-xs sm:text-[13px] text-ink-faint hover:text-ink-muted cursor-pointer"
+                    className="-mr-2 flex h-11 min-w-11 cursor-pointer items-center justify-center px-2 text-[13px] text-ink-faint hover:text-ink-muted sm:h-auto sm:min-w-0 sm:px-0"
                     // The label says what the click does; the state is conveyed by
                     // the input type, which assistive tech already announces.
                     aria-label={visible ? 'Hide password' : 'Show password'}

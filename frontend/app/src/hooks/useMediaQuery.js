@@ -29,7 +29,9 @@ export function useMediaQuery(query) {
 /**
  * Above this, the desktop layout holds: 244px sidebar plus a 720px reading
  * column, with room left over. Below it the sidebar collapses behind a button.
- * Named because it is a product decision, not a Tailwind breakpoint.
+ *
+ * Mirrored by `--breakpoint-desk` in index.css, which is how CSS says the same
+ * thing. Change one and the other has to change with it.
  */
 export const DESKTOP_QUERY = '(min-width: 900px)';
 

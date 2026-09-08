@@ -17,7 +17,7 @@ export default function Tabs({ items, value, onChange, className }) {
                         aria-selected={selected}
                         onClick={() => onChange(item.value)}
                         className={cx(
-                            'pb-[10px] -mb-px text-sm cursor-pointer border-b-2 transition-colors',
+                            '-mb-px flex min-h-11 cursor-pointer items-center border-b-2 pb-[10px] text-sm transition-colors sm:min-h-0 sm:pt-0',
                             selected
                                 ? 'font-semibold text-ink border-accent'
                                 : 'text-ink-faint border-transparent hover:text-ink-muted',

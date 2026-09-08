@@ -47,6 +47,12 @@
   --font-sans: 'Source Sans 3 Variable', 'Source Sans 3', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Consolas', monospace;
 
+  /* Where the chat's desktop layout starts: a 244px sidebar beside a 720px
+     reading column. Kept in step with DESKTOP_QUERY in hooks/useMediaQuery.js,
+     which decides the same thing in JavaScript — the sidebar and the header's
+     document chips have to appear at the same width, not 124px apart. */
+  --breakpoint-desk: 900px;
+
   --shadow-modal: 0 30px 70px rgba(31, 29, 26, 0.28);
   --shadow-ring: 0 0 0 3px rgba(154, 91, 46, 0.13);
 
@@ -144,9 +150,16 @@
 
 .prose-answer {
   font-family: var(--font-serif);
-  font-size: 17px;
+  /* 16px on a phone, 17px once there is a column to read it in. */
+  font-size: 16px;
   line-height: 1.65;
   color: var(--color-ink-body);
+}
+
+@media (min-width: 640px) {
+  .prose-answer {
+    font-size: 17px;
+  }
 }
 
 .prose-answer > *:first-child {

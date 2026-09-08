@@ -10,7 +10,7 @@ function formatTime(value) {
     const date = new Date(value);
     return Number.isNaN(date.getTime())
         ? null
-        : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 function QuestionBlock({ message }) {
@@ -18,7 +18,9 @@ function QuestionBlock({ message }) {
 
     return (
         <div className="flex flex-col gap-1.5 border-l-[3px] border-accent pl-3.5 sm:pl-[18px]">
-            <Eyebrow tone="accent">You asked{time ? ` · ${time}` : ''}</Eyebrow>
+            <Eyebrow tone="accent">
+                You asked{time ? <span className="hidden sm:inline"> · {time}</span> : null}
+            </Eyebrow>
             <p className="font-serif text-[19px] leading-[1.35] text-ink sm:text-[22px]">
                 {message.content}
             </p>
@@ -59,14 +61,18 @@ function AnswerBlock({ message, onCopy, onRegenerate }) {
             {/* The mocks also offer Helpful / Not helpful. There is no endpoint
                 to record either, so they are left out rather than shipped as
                 buttons that quietly do nothing. */}
-            <div className="flex gap-4 text-xs text-ink-faint">
-                <button type="button" onClick={() => onCopy(message)} className="cursor-pointer hover:text-ink-muted">
+            <div className="-mx-2 flex text-xs text-ink-faint sm:mx-0 sm:gap-4">
+                <button
+                    type="button"
+                    onClick={() => onCopy(message)}
+                    className="flex min-h-11 cursor-pointer items-center px-2 hover:text-ink-muted sm:min-h-0 sm:px-0"
+                >
                     Copy
                 </button>
                 <button
                     type="button"
                     onClick={() => onRegenerate(message)}
-                    className="cursor-pointer hover:text-ink-muted"
+                    className="flex min-h-11 cursor-pointer items-center px-2 hover:text-ink-muted sm:min-h-0 sm:px-0"
                 >
                     Regenerate
                 </button>

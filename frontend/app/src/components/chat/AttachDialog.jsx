@@ -172,7 +172,7 @@ export default function AttachDialog({
     const failed = uploads.filter((upload) => upload.stage === 'failed').length;
 
     const libraryFooter = (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-[13px] text-ink-faint">
                 {attachedIds.size > 0 ? (
                     <button
@@ -187,19 +187,23 @@ export default function AttachDialog({
                     `${selected.size} selected`
                 )}
             </span>
-            <div className="flex gap-2.5">
-                <Button variant="secondary" onClick={close}>
-                    Cancel
+            <div className="flex flex-col gap-2.5 sm:flex-row">
+                <Button onClick={attach} disabled={selected.size === 0 || busy} className="order-first py-3.5 sm:order-last sm:py-[11px]">
+                    {busy
+                        ? 'Attaching…'
+                        : selected.size > 0
+                          ? `Attach ${selected.size} document${selected.size === 1 ? '' : 's'}`
+                          : 'Attach to chat'}
                 </Button>
-                <Button onClick={attach} disabled={selected.size === 0 || busy}>
-                    {busy ? 'Attaching…' : 'Attach to chat'}
+                <Button variant="secondary" onClick={close} className="py-3.5 sm:py-[11px]">
+                    Cancel
                 </Button>
             </div>
         </div>
     );
 
     const uploadFooter = (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-[13px] text-ink-faint">
                 {uploads.length === 0
                     ? 'Nothing uploading'
@@ -213,7 +217,7 @@ export default function AttachDialog({
             {/* No "Attach when ready" button: the Upload tab attaches as part of
                 uploading, so by the time a file is indexing it is already on the
                 chat. There is nothing left to confirm. */}
-            <Button variant="secondary" onClick={close}>
+            <Button variant="secondary" onClick={close} className="py-3.5 sm:py-[11px]">
                 Close
             </Button>
         </div>

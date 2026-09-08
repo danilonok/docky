@@ -116,7 +116,7 @@ export default function UploadCard({ upload, status, onRetry, onDismiss }) {
                     </p>
                 </div>
 
-                <div className="flex shrink-0 gap-2">
+                <div className="hidden shrink-0 gap-2 sm:flex">
                     {failed && (
                         <Button variant="secondary" size="sm" onClick={() => onRetry(upload)}>
                             Retry
@@ -137,6 +137,17 @@ export default function UploadCard({ upload, status, onRetry, onDismiss }) {
                         Dismiss
                     </Button>
                 </div>
+            </div>
+
+            <div className="mt-3 flex gap-2 sm:hidden">
+                {failed && (
+                    <Button variant="secondary" onClick={() => onRetry(upload)} className="flex-1 py-3">
+                        Retry
+                    </Button>
+                )}
+                <Button variant="secondary" onClick={() => onDismiss(upload)} className="flex-1 py-3">
+                    Dismiss
+                </Button>
             </div>
         </div>
     );

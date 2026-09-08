@@ -36,7 +36,7 @@ export default function ChatHeader({
                             type="button"
                             onClick={onMenu}
                             aria-label="Open chat list"
-                            className="shrink-0 cursor-pointer text-xl leading-none text-ink-faint lg:hidden"
+                            className="-ml-2 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center text-xl leading-none text-ink-faint desk:hidden"
                         >
                             ☰
                         </button>
@@ -51,7 +51,7 @@ export default function ChatHeader({
                     </div>
                 </div>
 
-                <div className="hidden shrink-0 items-center gap-2 lg:flex">
+                <div className="hidden shrink-0 items-center gap-2 desk:flex">
                     {documents.map((document) => {
                         const status = describeIndexing(indexing[document.id]);
                         const pending = status && !status.done;
@@ -78,7 +78,7 @@ export default function ChatHeader({
                     </Chip>
                 </div>
 
-                <Chip tone="action" as="button" type="button" onClick={onAddDocuments} className="lg:hidden">
+                <Chip tone="action" as="button" type="button" onClick={onAddDocuments} className="desk:hidden">
                     Files
                 </Chip>
             </div>
@@ -89,7 +89,7 @@ export default function ChatHeader({
                 <button
                     type="button"
                     onClick={onAddDocuments}
-                    className="-mx-4 mt-3 flex w-[calc(100%+2rem)] items-center justify-between gap-3 border-y border-line-soft bg-paper-tint px-4 py-2.5 text-left text-xs text-accent lg:hidden"
+                    className="-mx-4 mt-3 flex w-[calc(100%+2rem)] items-center justify-between gap-3 border-y border-line-soft bg-paper-tint px-4 py-2.5 text-left text-xs text-accent desk:hidden"
                 >
                     <span className="truncate">
                         {working.length === 1

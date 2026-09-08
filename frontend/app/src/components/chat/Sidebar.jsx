@@ -77,7 +77,7 @@ export default function Sidebar({
                                             type="button"
                                             onClick={() => onDeleteChat(chat)}
                                             aria-label={`Delete chat ${chat.title}`}
-                                            className="absolute right-1.5 top-1/2 -translate-y-1/2 cursor-pointer rounded px-1.5 py-0.5 text-sm text-ink-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
+                                            className="absolute right-0.5 top-1/2 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded text-sm text-ink-faint hover:text-danger focus-visible:opacity-100 desk:h-8 desk:w-8 desk:opacity-0 desk:group-hover:opacity-100"
                                         >
                                             ×
                                         </button>
