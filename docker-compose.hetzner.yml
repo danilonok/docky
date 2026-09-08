@@ -3,6 +3,7 @@ services:
   frontend:
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      DOCKY_EDITION: ${DOCKY_EDITION:-cloud}
     ports:
       - "80:80"
       - "443:443"

@@ -50,6 +50,7 @@ jobs:
       DOCLING_TIMEOUT: ${{ vars.DOCLING_TIMEOUT }}
       CHUNK_SIZE: ${{ vars.CHUNK_SIZE }}
       CHUNK_OVERLAP: ${{ vars.CHUNK_OVERLAP }}
+      DOCKY_EDITION: ${{ vars.DOCKY_EDITION || 'selfhosted' }}
 
     steps:
       - uses: actions/checkout@v6

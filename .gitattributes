@@ -6,3 +6,8 @@ frontend/** linguist-vendored
 uv.lock                        linguist-generated
 frontend/openapi.json          linguist-generated
 frontend/app/package-lock.json linguist-generated
+
+# Shell scripts run inside Linux containers. A Windows checkout with
+# core.autocrlf=true would otherwise hand Docker a script with CRLF endings,
+# whose shebang the container cannot execute.
+*.sh text eol=lf

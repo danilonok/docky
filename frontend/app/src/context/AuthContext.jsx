@@ -30,10 +30,10 @@ export function AuthProvider({ children }) {
         fetchUser();
     }, [fetchUser]);
 
-    const login = async (email, password) => {
+    const login = async (email, password, { keepSignedIn = true } = {}) => {
         setError(null);
         try {
-            await loginUser(email, password);
+            await loginUser(email, password, { persist: keepSignedIn });
             await fetchUser();
             return true;
         } catch (err) {

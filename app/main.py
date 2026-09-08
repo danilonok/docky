@@ -8,7 +8,7 @@ from fastapi import Request
 
 from app.dependencies.database import SessionDep
 
-from .routers import users, chats, messages, tasks, documents
+from .routers import users, chats, messages, tasks, documents, meta
 from typing import Annotated
 
 from app.auth.helpers import ACCESS_TOKEN_EXPIRE_MINUTES, Token
@@ -58,6 +58,7 @@ app.include_router(chats.router)
 app.include_router(messages.router)
 app.include_router(tasks.router)
 app.include_router(documents.router)
+app.include_router(meta.router)
 
 @app.get("/")
 async def root():

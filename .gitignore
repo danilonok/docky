@@ -215,3 +215,9 @@ test.py
 
 # All pdfs
 *.pdf
+# The Python packaging rules near the top (build/, dist/, lib/, share/, var/ …)
+# are unanchored, so they match those names at any depth — including inside the
+# React app, where `src/lib/` is ordinary source. The frontend keeps its own
+# .gitignore for its build output; nothing under its source tree should be
+# swallowed by rules meant for a virtualenv at the repo root.
+!frontend/app/src/**

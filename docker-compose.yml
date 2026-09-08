@@ -139,6 +139,11 @@ services:
   # This is the only service a browser talks to; `api` itself stays internal.
   frontend:
     image: ${DOCKY_FRONTEND_IMAGE:-docky-frontend}:${DOCKY_TAG:-latest}
+    environment:
+      # Which edition's copy the SPA shows. One image serves both; the container
+      # renders /config.json from this on start. Each deployment's override file
+      # sets it, so this default only covers running the base file on its own.
+      DOCKY_EDITION: ${DOCKY_EDITION:-cloud}
     depends_on:
       api:
         condition: service_started

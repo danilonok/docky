@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -21,6 +23,7 @@ class DocumentUpdate(DocumentBase):
 
 class DocumentRead(DocumentBase):
     id: int
+    uploaded_at: datetime
 
     user_id: int | None = None
 

@@ -35,7 +35,15 @@ def add_chat(user_ids: List[int], current_user: UserRead, title: str, session: S
 
 def get_chats(session: SessionDep, current_user: UserRead, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> list[Chat] | None:
     '''Get all chats of the current user'''
-    chats = session.scalars(select(Chat).where(Chat.users.any(User.id==current_user.id)).offset(offset).limit(limit)).all() 
+    chats = session.scalars(
+        select(Chat)
+        .where(Chat.users.any(User.id == current_user.id))
+        # Without this, reading `document_count` on each row would issue a query
+        # per chat. One extra query covers the whole page instead.
+        .options(selectinload(Chat.documents))
+        .offset(offset)
+        .limit(limit)
+    ).all()
     return list(chats)
 
 def get_chat_by_id(id: int, session: SessionDep) -> Chat | None:
@@ -68,7 +76,12 @@ def add_document_to_chat(session: SessionDep, document: Document, chat: Chat) ->
     chat.documents.append(document)
     session.commit()
     # Add document to index
-    task = upload_document.delay(chat_id=chat.id, document_path=document.file_name)
+    task = upload_document.delay(
+        chat_id=chat.id,
+        document_path=document.file_name,
+        document_id=document.id,
+        document_name=document.original_file_name,
+    )
     return task.id
 
 def clear_documents_in_chat(session: SessionDep, chat: Chat) -> None:
