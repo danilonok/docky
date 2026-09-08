@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -13,5 +15,9 @@ class ChatUpdate(ChatBase):
 
 class ChatRead(ChatBase):
     id: int
+    created_at: datetime
+    document_count: int = Field(
+        default=0, description="Documents attached to this chat."
+    )
 
     model_config = ConfigDict(from_attributes=True)

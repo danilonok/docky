@@ -2,8 +2,23 @@ from app.tasks.celery import app
 from app.tasks.nodes.nodes import add_document_to_index, query_rag, clear_documents_in_chat, add_summary
 
 @app.task
-def upload_document(document_path: str, chat_id: int):
-    result = add_document_to_index(document_path=document_path, chat_id=chat_id)
+def upload_document(
+    document_path: str,
+    chat_id: int,
+    document_id: int | None = None,
+    document_name: str | None = None,
+):
+    """Index a document into a chat.
+
+    The provenance arguments are optional so that a task already sitting on the
+    queue when this shipped — enqueued with two arguments — still runs.
+    """
+    result = add_document_to_index(
+        document_path=document_path,
+        chat_id=chat_id,
+        document_id=document_id,
+        document_name=document_name,
+    )
     return result
 
 @app.task

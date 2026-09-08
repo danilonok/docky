@@ -54,5 +54,10 @@ def add_document_to_index(document_id: int, chat_id: int, current_user: UserRead
     document = session.scalars(select(Document).where((Document.id == document_id) & (Document.user_id == current_user.id))).first()
     if not document:
         return None
-    res = upload_document.delay(document.file_name, chat_id)
+    res = upload_document.delay(
+        document_path=document.file_name,
+        chat_id=chat_id,
+        document_id=document.id,
+        document_name=document.original_file_name,
+    )
     return res.id

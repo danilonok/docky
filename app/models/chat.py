@@ -29,3 +29,12 @@ class Chat(Base):
     messages: Mapped[list["Message"]] = relationship(back_populates="chat")
 
     documents: Mapped[list["Document"]] = relationship(secondary=chat_document, back_populates="chats")
+
+    @property
+    def document_count(self) -> int:
+        """How many documents are attached, for a chat list that has to show it.
+
+        Reads the loaded collection, so callers listing many chats should eager
+        load `documents` (see `get_chats`) rather than pay a query per row.
+        """
+        return len(self.documents)

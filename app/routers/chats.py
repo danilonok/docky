@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, Request, Response, status
 
 
 from typing import List, Annotated
@@ -17,12 +17,14 @@ from app.services import chats as chat_service
 router = APIRouter()
 
 @router.get("/chats", tags=["chats"], response_model=list[ChatRead])
-async def get_chats(current_user: Annotated[UserRead, Depends(get_current_active_user)], session: SessionDep, offset: int = 0, limit: int = 100) -> List[Chat] | None:
-    chats = chat_service.get_chats(current_user=current_user, limit=limit, offset=offset, session=session)
-    if chats:
-        return chats
+async def get_chats(current_user: Annotated[UserRead, Depends(get_current_active_user)], session: SessionDep, offset: int = 0, limit: int = 100) -> List[Chat]:
+    """List the current user's chats.
 
-    raise HTTPException(status_code=404, detail="Chats are not found")
+    A user with no chats gets an empty list, not a 404: having nothing yet is a
+    normal state for a new account, and the client renders an empty list very
+    differently from a failed request.
+    """
+    return chat_service.get_chats(current_user=current_user, limit=limit, offset=offset, session=session)
 
 @router.get("/chats/{chatId}", tags=["chats"], response_model=ChatRead)
 async def get_chat(chat: ChatDep) -> Chat:
@@ -43,10 +45,8 @@ async def add_document_to_chat(request: Request, chat: ChatDep, document: OwnedD
 
 @router.get("/chats/{chatId}/documents", tags=["chats"], response_model=list[DocumentRead])
 async def get_documents_in_chat(chat: ChatDep) -> list[Document]:
-    chat_docs = chat_service.get_documents(chat=chat)
-    if chat_docs:
-        return chat_docs
-    raise HTTPException(status_code=404, detail="Chat has no documents attached")
+    """Documents attached to this chat — empty until the user attaches one."""
+    return chat_service.get_documents(chat=chat)
 
 @router.delete("/chats/{chatId}/documents", tags=["chats"])
 async def delete_documents_in_chat(chat: ChatDep, session: SessionDep) -> Response:
